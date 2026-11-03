@@ -1,0 +1,749 @@
+/* ============================================================
+   TrustFund – Modern Fintech UI Styles
+   Inspired by Reference Fintech Donation Dashboard
+   Design: Dark Navy + Emerald Green + White & Light Grey
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* --- CSS Design Tokens --- */
+:root {
+  /* Color Palette */
+  --tf-navy: #0f172a;               /* Primary Dark Navy */
+  --tf-navy-dark: #0a1122;          /* Deeper Navy for contrast */
+  --tf-navy-surface: #1e293b;       /* Navy secondary surface */
+  --tf-emerald: #059669;            /* Secondary Emerald Green */
+  --tf-emerald-hover: #047857;      /* Emerald Darker */
+  --tf-emerald-light: #10b981;      /* Bright Emerald */
+  --tf-emerald-subtle: #ecfdf5;     /* Soft Emerald Background */
+  --tf-emerald-border: #a7f3d0;     /* Soft Emerald Border */
+
+  /* Neutral Backgrounds */
+  --tf-bg-page: #f8fafc;            /* Crisp light grey / off-white */
+  --tf-bg-card: #ffffff;            /* Pure white cards */
+  --tf-bg-subtle: #f1f5f9;          /* Neutral input & badge background */
+  --tf-border: #e2e8f0;             /* Clean border line */
+  --tf-border-subtle: #edf2f7;      /* Lighter border */
+
+  /* Text Colors */
+  --tf-text-primary: #0f172a;       /* Dark Navy main text */
+  --tf-text-secondary: #64748b;     /* Slate muted text */
+  --tf-text-light: #94a3b8;         /* Subdued caption */
+  --tf-text-white: #ffffff;         /* Pure white */
+
+  /* Status Colors */
+  --tf-amber: #f59e0b;
+  --tf-amber-subtle: #fffbeb;
+  --tf-amber-border: #fde68a;
+  --tf-blue: #2563eb;
+  --tf-blue-subtle: #eff6ff;
+  --tf-danger: #ef4444;
+  --tf-danger-subtle: #fef2f2;
+
+  /* Typography */
+  --tf-font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --tf-font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  /* Shadows */
+  --tf-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04);
+  --tf-shadow-md: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --tf-shadow-lg: 0 12px 32px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  --tf-shadow-emerald: 0 8px 24px -4px rgba(5, 150, 105, 0.35);
+
+  /* Radius */
+  --tf-radius-card: 22px;
+  --tf-radius-pill: 50px;
+  --tf-radius-input: 14px;
+}
+
+/* --- Global Reset & Base Typography --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--tf-font-main);
+  background-color: var(--tf-bg-page);
+  color: var(--tf-text-primary);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Modern Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: var(--tf-bg-page);
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+#mainNav {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--tf-border);
+  padding: 0.85rem 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
+}
+
+#mainNav .navbar-brand {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--tf-navy) !important;
+  letter-spacing: -0.5px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--tf-emerald) 0%, #047857 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);
+}
+
+#mainNav .nav-link {
+  color: var(--tf-text-secondary);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--tf-radius-pill);
+  transition: all 0.2s ease;
+  margin: 0 0.15rem;
+}
+
+#mainNav .nav-link:hover {
+  color: var(--tf-navy);
+  background-color: var(--tf-bg-subtle);
+}
+
+#mainNav .nav-link.active {
+  color: var(--tf-navy) !important;
+  background-color: var(--tf-emerald-subtle) !important;
+  box-shadow: inset 0 0 0 1px var(--tf-emerald-border);
+}
+
+.nav-stat-pill {
+  background: var(--tf-bg-subtle);
+  border: 1px solid var(--tf-border);
+  border-radius: var(--tf-radius-pill);
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--tf-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.nav-stat-pill strong {
+  color: var(--tf-emerald);
+}
+
+/* ============================================================
+   PAGE CONTAINER & SECTIONS
+   ============================================================ */
+.page-section {
+  padding-top: 86px;
+  min-height: calc(100vh - 86px);
+  animation: fadeIn 0.35s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Typography Helpers */
+.text-navy {
+  color: var(--tf-navy) !important;
+}
+
+.text-emerald {
+  color: var(--tf-emerald) !important;
+}
+
+.text-muted-custom {
+  color: var(--tf-text-secondary) !important;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--tf-navy);
+  letter-spacing: -0.6px;
+}
+
+/* ============================================================
+   HERO BANNER (Inspired by Reference Screenshot)
+   Deep emerald/dark-forest curved gradient container
+   ============================================================ */
+.hero-banner-container {
+  padding: 1.5rem 0 2rem;
+}
+
+.hero-fintech-banner {
+  background: radial-gradient(120% 120% at 50% 20%, #065f46 0%, #064e3b 40%, #022c22 85%, #031e17 100%);
+  border-radius: 28px;
+  padding: 3.5rem 2.5rem;
+  color: var(--tf-text-white);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 16px 36px -6px rgba(6, 78, 59, 0.35), 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Subtle glow rings */
+.hero-fintech-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-category-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.75rem;
+}
+
+.hero-big-number {
+  font-size: 4rem;
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1;
+  color: #ffffff;
+  margin: 0.5rem 0;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .hero-big-number {
+    font-size: 2.75rem;
+  }
+  .hero-fintech-banner {
+    padding: 2.5rem 1.5rem;
+  }
+}
+
+.hero-usd-subtext {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================================
+   CARDS (Fintech-style, Rounded, Subtle Shadow)
+   ============================================================ */
+.card {
+  background-color: var(--tf-bg-card);
+  border: 1px solid var(--tf-border);
+  border-radius: var(--tf-radius-card);
+  box-shadow: var(--tf-shadow-md);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--tf-shadow-lg);
+  border-color: #cbd5e1;
+}
+
+.card-header {
+  background-color: transparent;
+  border-bottom: 1px solid var(--tf-border-subtle);
+  padding: 1.25rem 1.5rem;
+  font-weight: 700;
+  color: var(--tf-navy);
+}
+
+.card-header h5 {
+  color: var(--tf-navy);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* Solid Emerald Feature Card (from reference screenshot) */
+.card-solid-emerald {
+  background: linear-gradient(145deg, #059669 0%, #047857 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 10px 28px -4px rgba(5, 150, 105, 0.4) !important;
+}
+
+.card-solid-emerald h3,
+.card-solid-emerald h4,
+.card-solid-emerald h5,
+.card-solid-emerald p {
+  color: #ffffff !important;
+}
+
+.card-solid-emerald .card-subtext {
+  color: rgba(255, 255, 255, 0.82) !important;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* Dark Navy Contrast Card (from reference screenshot) */
+.card-dark-navy {
+  background-color: var(--tf-navy) !important;
+  color: #ffffff !important;
+  border: 1px solid #1e293b !important;
+  box-shadow: 0 10px 28px -4px rgba(15, 23, 42, 0.3) !important;
+}
+
+.card-dark-navy h5,
+.card-dark-navy p {
+  color: #ffffff !important;
+}
+
+.card-dark-navy .badge-amber-big {
+  background-color: #fbbf24;
+  color: #0f172a;
+  font-size: 1.8rem;
+  font-weight: 800;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+}
+
+/* Stat Cards */
+.stat-card {
+  border: 1px solid var(--tf-border);
+  background-color: #ffffff;
+}
+
+.stat-card .stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--tf-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.stat-card .stat-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--tf-navy);
+  letter-spacing: -0.8px;
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Step Card */
+.step-card {
+  text-align: center;
+  padding: 1.75rem 1.25rem;
+}
+
+.step-card .step-icon-wrap {
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  background-color: var(--tf-emerald-subtle);
+  border: 1px solid var(--tf-emerald-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.step-card h5 {
+  font-weight: 700;
+  color: var(--tf-navy);
+  margin-bottom: 0.5rem;
+}
+
+/* Campaign Card (Featured) */
+.campaign-card {
+  border: 1px solid var(--tf-border);
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.campaign-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--tf-emerald) 0%, #34d399 100%);
+}
+
+/* ============================================================
+   BUTTONS (Pills with Smooth Hover)
+   ============================================================ */
+.btn {
+  font-family: var(--tf-font-main);
+  border-radius: var(--tf-radius-pill);
+  font-weight: 600;
+  padding: 0.6rem 1.4rem;
+  transition: all 0.2s ease;
+}
+
+.btn-emerald {
+  background-color: var(--tf-emerald);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.28);
+}
+
+.btn-emerald:hover,
+.btn-emerald:focus {
+  background-color: var(--tf-emerald-hover);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.38);
+}
+
+.btn-white-pill {
+  background-color: #ffffff;
+  color: #047857;
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn-white-pill:hover {
+  background-color: #f8fafc;
+  color: #065f46;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.btn-dark-pill {
+  background-color: var(--tf-navy);
+  color: #ffffff;
+  border: none;
+}
+
+.btn-dark-pill:hover {
+  background-color: var(--tf-navy-dark);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-outline-emerald {
+  border: 1.5px solid var(--tf-emerald);
+  color: var(--tf-emerald);
+  background: transparent;
+}
+
+.btn-outline-emerald:hover {
+  background-color: var(--tf-emerald);
+  color: #ffffff;
+}
+
+.btn-outline-custom {
+  border: 1.5px solid var(--tf-border);
+  color: var(--tf-text-secondary);
+  background: #ffffff;
+}
+
+.btn-outline-custom:hover {
+  border-color: #cbd5e1;
+  background-color: var(--tf-bg-subtle);
+  color: var(--tf-navy);
+}
+
+.btn-glass-pill {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+.btn-glass-pill:hover {
+  background: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   PILLS & BADGES (Soft Pastel & Rounded)
+   ============================================================ */
+.badge {
+  border-radius: var(--tf-radius-pill);
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.78rem;
+}
+
+.badge-emerald-soft {
+  background-color: var(--tf-emerald-subtle) !important;
+  color: var(--tf-emerald) !important;
+  border: 1px solid var(--tf-emerald-border);
+}
+
+.badge-amber-soft {
+  background-color: var(--tf-amber-subtle) !important;
+  color: #b45309 !important;
+  border: 1px solid var(--tf-amber-border);
+}
+
+.badge-blue-soft {
+  background-color: var(--tf-blue-subtle) !important;
+  color: var(--tf-blue) !important;
+  border: 1px solid #bfdbfe;
+}
+
+.badge-danger-soft {
+  background-color: var(--tf-danger-subtle) !important;
+  color: var(--tf-danger) !important;
+  border: 1px solid #fecaca;
+}
+
+/* ============================================================
+   PROGRESS BARS (Segmented & Rounded)
+   ============================================================ */
+.progress {
+  height: 12px;
+  background-color: #e2e8f0;
+  border-radius: var(--tf-radius-pill);
+  overflow: hidden;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, var(--tf-emerald) 0%, #10b981 100%);
+  border-radius: var(--tf-radius-pill);
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Segmented progress bar (like screenshot) */
+.segmented-progress {
+  display: flex;
+  gap: 4px;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.segmented-progress .seg {
+  flex: 1;
+  background-color: #e2e8f0;
+  border-radius: 3px;
+}
+
+.segmented-progress .seg.active-emerald {
+  background-color: var(--tf-emerald);
+}
+
+.segmented-progress .seg.active-amber {
+  background-color: var(--tf-amber);
+}
+
+/* ============================================================
+   TABLES (Clean Fintech Rows)
+   ============================================================ */
+.table-custom {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.table-custom thead th {
+  background-color: #f8fafc;
+  color: var(--tf-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--tf-border);
+  padding: 0.9rem 1.25rem;
+}
+
+.table-custom tbody td {
+  padding: 1rem 1.25rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--tf-border-subtle);
+  color: var(--tf-navy);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.table-custom tbody tr:hover td {
+  background-color: #f8fafc;
+}
+
+.tx-hash {
+  font-family: var(--tf-font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--tf-blue);
+  background: #f1f5f9;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+}
+
+.tx-hash:hover {
+  background: #e2e8f0;
+  text-decoration: underline;
+}
+
+/* Backward-compatible class for modules */
+.table-dark-custom {
+  margin-bottom: 0;
+  width: 100%;
+}
+.table-dark-custom thead th {
+  background-color: #f8fafc !important;
+  color: var(--tf-text-secondary) !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--tf-border);
+  padding: 0.9rem 1.25rem;
+}
+.table-dark-custom tbody td {
+  padding: 1rem 1.25rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--tf-border-subtle);
+  color: var(--tf-navy) !important;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.table-dark-custom tbody tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* ============================================================
+   FORMS & INPUT CONTROLS
+   ============================================================ */
+.form-label {
+  color: var(--tf-navy);
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+}
+
+.form-control,
+.form-select {
+  background-color: #f8fafc;
+  border: 1.5px solid var(--tf-border);
+  color: var(--tf-navy);
+  border-radius: var(--tf-radius-input);
+  padding: 0.7rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: #ffffff;
+  color: var(--tf-navy);
+  border-color: var(--tf-emerald);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+}
+
+.form-control::placeholder {
+  color: #94a3b8;
+}
+
+/* AI Status Callout Box */
+.ai-status-box {
+  background-color: var(--tf-amber-subtle);
+  border: 1px solid var(--tf-amber-border);
+  border-radius: 14px;
+}
+
+/* ============================================================
+   ALERT & INSIGHT ITEMS
+   ============================================================ */
+.alert-item {
+  padding: 1rem;
+  border-radius: 16px;
+  background-color: #f8fafc;
+  border: 1px solid var(--tf-border);
+  transition: transform 0.15s ease;
+}
+
+.alert-item:hover {
+  transform: translateX(2px);
+  border-color: #cbd5e1;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer {
+  background-color: #ffffff;
+  border-top: 1px solid var(--tf-border);
+  padding: 3rem 0 1.75rem;
+  margin-top: 4rem;
+}
+
+.site-footer h6 {
+  font-weight: 700;
+  color: var(--tf-navy);
+  font-size: 0.95rem;
+}
+
+.site-footer ul li {
+  color: var(--tf-text-secondary);
+  font-size: 0.88rem;
+  margin-bottom: 0.35rem;
+}
+
+/* Toast Notifications */
+.toast {
+  background-color: #ffffff !important;
+  color: var(--tf-navy) !important;
+  border: 1px solid var(--tf-border);
+  border-radius: 16px;
+  box-shadow: var(--tf-shadow-lg);
+}
+
+.toast.toast-success {
+  border-left: 5px solid var(--tf-emerald) !important;
+}
+
+.toast.toast-error {
+  border-left: 5px solid var(--tf-danger) !important;
+}
+
+/* Wallet Connected State */
+.wallet-connected {
+  border-color: var(--tf-emerald) !important;
+  color: var(--tf-emerald) !important;
+  background-color: var(--tf-emerald-subtle) !important;
+}
