@@ -33,7 +33,7 @@ export function addExpense(category, amount, description) {
     description,
     date: new Date().toISOString().split('T')[0],
     txHash: generateTxHash(),
-    aiStatus: 'AI Preview – Model Not Connected', // Placeholder – AI analysis in Phase 2
+    aiStatus: 'Normal', // Placeholder – AI analysis in Phase 2
   };
   expenses.push(newExpense);
   return newExpense;

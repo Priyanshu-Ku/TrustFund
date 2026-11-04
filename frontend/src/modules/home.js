@@ -2,20 +2,37 @@
  * TrustFund – Home Page Module
  * =============================
  * Updates the home page campaign progress, hero banner, and statistics.
+ * Reflects live smart contract metrics on Ethereum Sepolia.
  */
 
-import { getTotalDonated, getDonationCount } from '../services/donationService.js';
 import { campaign } from '../data/mockData.js';
+
+let cachedSummary = null;
+let cachedDonationCount = 0;
+
+/**
+ * Set the latest live blockchain statistics from smart contract
+ * @param {Object} summary - Contract summary { totalDonations, contractBalance, etc. }
+ * @param {number} count - Total on-chain donation count
+ */
+export function setBlockchainHomeStats(summary, count) {
+  cachedSummary = summary;
+  cachedDonationCount = count;
+  updateHomePage();
+}
 
 /**
  * Refresh the home page with current data
  */
 export function updateHomePage() {
-  const totalDonated = getTotalDonated();
-  const donationCount = getDonationCount();
-  const progressPercent = Math.min((totalDonated / campaign.goal) * 100, 100);
+  const totalDonated = cachedSummary
+    ? parseFloat(cachedSummary.totalDonations)
+    : 0;
+  const donationCount = cachedDonationCount;
+  const goal = campaign?.goal || 10;
+  const progressPercent = Math.min((totalDonated / goal) * 100, 100);
 
-  // Update big hero display amount (mirroring the reference screenshot)
+  // Update big hero display amount
   const heroAmountEl = document.getElementById('home-hero-amount');
   if (heroAmountEl) heroAmountEl.textContent = `${totalDonated.toFixed(2)} ETH`;
 
@@ -27,12 +44,12 @@ export function updateHomePage() {
       currency: 'USD',
       maximumFractionDigits: 2,
     });
-    heroUsdEl.textContent = `≈ ${usd} USD`;
+    heroUsdEl.textContent = `≈ ${usd} USD Tracked in Real-Time`;
   }
 
   // Update navbar live pool badge
   const navPoolEl = document.getElementById('nav-live-pool');
-  if (navPoolEl) navPoolEl.textContent = `${totalDonated.toFixed(2)} ETH`;
+  if (navPoolEl) navPoolEl.textContent = `${totalDonated.toFixed(4)} ETH`;
 
   // Update campaign raised amount
   const raisedEl = document.getElementById('campaign-raised');
@@ -48,7 +65,7 @@ export function updateHomePage() {
   // Update progress percentage badge
   const progressBadgeEl = document.getElementById('campaign-percent-badge');
   if (progressBadgeEl) {
-    progressBadgeEl.textContent = `${progressPercent.toFixed(0)}% Achieved`;
+    progressBadgeEl.textContent = `+${progressPercent.toFixed(0)}% Achieved`;
   }
 
   // Update about section stats

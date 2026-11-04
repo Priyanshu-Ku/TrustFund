@@ -741,6 +741,10 @@ body {
   border-left: 5px solid var(--tf-danger) !important;
 }
 
+.toast.toast-info {
+  border-left: 5px solid var(--tf-blue) !important;
+}
+
 /* Wallet Connected State */
 .wallet-connected {
   border-color: var(--tf-emerald) !important;
