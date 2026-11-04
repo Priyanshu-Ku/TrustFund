@@ -3,6 +3,7 @@
  * ==========================
  * Renders a modern donut chart on a canvas element for fund utilization.
  * Styled for the light fintech palette (white background, dark navy text, emerald & amber segments).
+ * Uses real smart contract data: totalExpenses (utilized) and contractBalance (remaining).
  */
 
 /**
@@ -10,8 +11,9 @@
  * @param {string} canvasId - The ID of the canvas element
  * @param {number} totalDonations - Total donations in ETH
  * @param {number} totalExpenses - Total expenses in ETH
+ * @param {number} [contractBalance] - Remaining contract balance in ETH
  */
-export function drawFundChart(canvasId, totalDonations, totalExpenses) {
+export function drawFundChart(canvasId, totalDonations, totalExpenses, contractBalance) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
 
@@ -26,8 +28,8 @@ export function drawFundChart(canvasId, totalDonations, totalExpenses) {
   // Clear canvas
   ctx.clearRect(0, 0, width, height);
 
-  // If no data, draw empty state
-  if (totalDonations === 0) {
+  // If no donations yet, safely render empty state (avoid division by zero)
+  if (totalDonations <= 0) {
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
     ctx.strokeStyle = '#e2e8f0';
@@ -37,11 +39,15 @@ export function drawFundChart(canvasId, totalDonations, totalExpenses) {
     ctx.fillStyle = '#64748b';
     ctx.font = '600 14px "Plus Jakarta Sans", system-ui, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('No activity yet', centerX, centerY + 5);
+    ctx.fillText('No donations yet', centerX, centerY + 5);
     return;
   }
 
-  const remaining = Math.max(0, totalDonations - totalExpenses);
+  // Use actual contract balance if provided, else fallback to totalDonations - totalExpenses
+  const remaining = typeof contractBalance === 'number'
+    ? Math.max(0, contractBalance)
+    : Math.max(0, totalDonations - totalExpenses);
+
   const segments = [
     { label: 'Utilized', value: totalExpenses, color: '#f59e0b' },
     { label: 'Remaining', value: remaining, color: '#059669' },
@@ -53,7 +59,7 @@ export function drawFundChart(canvasId, totalDonations, totalExpenses) {
   let currentAngle = -Math.PI / 2; // Start from top
 
   segments.forEach((segment) => {
-    if (segment.value <= 0) return;
+    if (segment.value <= 0 || total <= 0) return;
 
     const sliceAngle = (segment.value / total) * 2 * Math.PI;
 
@@ -80,25 +86,27 @@ export function drawFundChart(canvasId, totalDonations, totalExpenses) {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Center percentage in bold Dark Navy
-  const percentage = totalDonations > 0
-    ? Math.round((totalExpenses / totalDonations) * 100)
-    : 0;
+  // Calculate percentage: (totalExpenses / totalDonations) * 100
+  const rawPercentage = (totalExpenses / totalDonations) * 100;
+  const formattedPct = rawPercentage % 1 === 0
+    ? `${rawPercentage.toFixed(0)}%`
+    : `${rawPercentage.toFixed(1)}%`;
 
+  // Center percentage in bold Dark Navy
   ctx.fillStyle = '#0f172a';
   ctx.font = '800 24px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(`${percentage}%`, centerX, centerY - 8);
+  ctx.fillText(formattedPct, centerX, centerY - 8);
 
-  // Subtitle "Utilized"
+  // Subtitle "Funds Utilized"
   ctx.fillStyle = '#64748b';
   ctx.font = '600 12px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.fillText('Funds Utilized', centerX, centerY + 14);
 
-  // Draw clean modern legend below chart
+  // Draw modern legend below chart
   const legendY = height - 22;
-  const legendSpacing = 130;
+  const legendSpacing = 135;
   const legendStartX = centerX - legendSpacing / 2;
 
   segments.forEach((segment, i) => {
@@ -114,6 +122,6 @@ export function drawFundChart(canvasId, totalDonations, totalExpenses) {
     ctx.fillStyle = '#0f172a';
     ctx.font = '600 12px "Plus Jakarta Sans", system-ui, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(`${segment.label}: ${segment.value.toFixed(2)} ETH`, x, legendY + 4);
+    ctx.fillText(`${segment.label}: ${segment.value.toFixed(4)} ETH`, x, legendY + 4);
   });
 }

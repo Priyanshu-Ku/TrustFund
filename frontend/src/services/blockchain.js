@@ -250,3 +250,31 @@ export async function getAdminAddress() {
     const contract = await getReadContract();
     return await contract.admin();
 }
+
+
+// Contract deployment block on Ethereum Sepolia
+export const DEPLOYMENT_BLOCK = 12061871;
+
+// Retrieve DonationReceived event logs with actual transaction hashes
+export async function getDonationEvents(fromBlock = DEPLOYMENT_BLOCK) {
+    try {
+        const contract = await getReadContract();
+        const filter = contract.filters.DonationReceived();
+        return await contract.queryFilter(filter, fromBlock);
+    } catch (err) {
+        console.warn('Could not query DonationReceived events:', err);
+        return [];
+    }
+}
+
+// Retrieve ExpenseSubmitted event logs with actual transaction hashes
+export async function getExpenseEvents(fromBlock = DEPLOYMENT_BLOCK) {
+    try {
+        const contract = await getReadContract();
+        const filter = contract.filters.ExpenseSubmitted();
+        return await contract.queryFilter(filter, fromBlock);
+    } catch (err) {
+        console.warn('Could not query ExpenseSubmitted events:', err);
+        return [];
+    }
+}

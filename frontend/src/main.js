@@ -19,7 +19,7 @@ import { initNavigation } from './modules/navigation.js';
 import { updateHomePage } from './modules/home.js';
 import { initDonorDashboard, updateDonorDashboard } from './modules/donorDashboard.js';
 import { initNgoDashboard, updateNgoDashboard } from './modules/ngoDashboard.js';
-import { updateTransparencyDashboard } from './modules/transparencyDashboard.js';
+import { initTransparencyDashboard, updateTransparencyDashboard } from './modules/transparencyDashboard.js';
 
 // Make Bootstrap available globally (needed by toast helper and navigation)
 window.bootstrap = bootstrap;
@@ -47,9 +47,10 @@ function init() {
     refreshAllDashboards();
   });
 
-  // Initialise interactive forms (donation + expense)
+  // Initialise interactive forms & controls
   initDonorDashboard(refreshAllDashboards);
   initNgoDashboard(refreshAllDashboards);
+  initTransparencyDashboard();
 
   // Initial render of all dashboards with seed data
   refreshAllDashboards();
