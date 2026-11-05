@@ -942,6 +942,349 @@
         </div>
       </div>
 
+      <!-- ========================================================
+           AI CAMPAIGN BUDGET PLANNER
+           ======================================================== -->
+      <div class="row mt-5 pt-3" id="ngoBudgetPlannerContainer">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <!-- Header -->
+            <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+              <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon" style="background-color: var(--tf-emerald-subtle); color: var(--tf-emerald); width: 48px; height: 48px;">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                    <path d="M7 10l3 3 7-7"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="d-flex align-items-center gap-2">
+                    <h4 class="fw-bold text-navy mb-0">AI Campaign Budget Planner</h4>
+                    <span class="badge badge-emerald-soft">Gemini 3.6 Flash</span>
+                    <span class="badge badge-blue-soft">Sepolia Planning Model</span>
+                  </div>
+                  <p class="text-muted-custom mb-0 small">
+                    Generate an AI-assisted budget allocation based on your campaign goals and spending priorities.
+                  </p>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-light text-muted border px-3 py-2 small">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                  </svg>
+                  Planning Mode Only &bull; Zero On-Chain Gas
+                </span>
+              </div>
+            </div>
+
+            <!-- Body -->
+            <div class="card-body p-4 bg-light">
+              <!-- Live Blockchain Context Banner -->
+              <div class="card p-3 rounded-4 mb-4 border bg-white shadow-xs">
+                <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge badge-navy px-2 py-1 small">On-Chain Baseline</span>
+                    <strong class="text-navy small">Current Sepolia Smart Contract Metrics</strong>
+                  </div>
+                  <span class="text-muted-custom small" style="font-size: 0.78rem;">
+                    * The proposed campaign budget is a spending model; available liquid balance represents funds immediately spendable on-chain.
+                  </span>
+                </div>
+                <div class="row g-2 text-center">
+                  <div class="col-6 col-md">
+                    <div class="p-2 rounded-3 bg-light border">
+                      <div class="text-muted-custom small" style="font-size: 0.72rem;">Campaign Target</div>
+                      <div class="fw-bold text-navy small" id="bp-context-target">10.0 ETH</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md">
+                    <div class="p-2 rounded-3 bg-light border">
+                      <div class="text-muted-custom small" style="font-size: 0.72rem;">Total Donations</div>
+                      <div class="fw-bold text-navy small" id="bp-context-donations">0.0000 ETH</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md">
+                    <div class="p-2 rounded-3 bg-light border">
+                      <div class="text-muted-custom small" style="font-size: 0.72rem;">Expenses Paid</div>
+                      <div class="fw-bold text-navy small" id="bp-context-expenses">0.0000 ETH</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md">
+                    <div class="p-2 rounded-3 bg-light border">
+                      <div class="text-muted-custom small" style="font-size: 0.72rem;">Contract Balance</div>
+                      <div class="fw-bold text-navy small" id="bp-context-contract-balance">0.0000 ETH</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md">
+                    <div class="p-2 rounded-3 bg-light border">
+                      <div class="text-muted-custom small" style="font-size: 0.72rem;">Available Balance</div>
+                      <div class="fw-bold text-emerald small" id="bp-context-available-balance">0.0000 ETH</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Main Content: Left Inputs & Right Results Panel -->
+              <div class="row g-4">
+                <!-- Left Column: Inputs Form -->
+                <div class="col-lg-5" id="budgetPlannerFormCol">
+                  <div class="card p-4 rounded-4 bg-white border h-100 shadow-xs">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <h6 class="fw-bold text-navy mb-0">Campaign Planning Parameters</h6>
+                      <span class="badge bg-light text-muted border">Inputs</span>
+                    </div>
+
+                    <form id="budgetPlannerForm" novalidate>
+                      <!-- Campaign Name -->
+                      <div class="mb-3">
+                        <label for="bpCampaignName" class="form-label fw-semibold small text-navy">Campaign Name</label>
+                        <input type="text" class="form-control form-control-sm" id="bpCampaignName" value="Education for All" required>
+                        <div class="invalid-feedback">Please enter the campaign name.</div>
+                      </div>
+
+                      <!-- Total Campaign Budget in ETH -->
+                      <div class="mb-3">
+                        <label for="bpTotalBudget" class="form-label fw-semibold small text-navy">Total Campaign Budget (ETH)</label>
+                        <div class="input-group input-group-sm">
+                          <input type="number" class="form-control" id="bpTotalBudget" value="10" step="any" min="0.0001" placeholder="e.g. 10" required>
+                          <span class="input-group-text bg-light fw-bold text-navy border-start-0" style="border-radius: 0 14px 14px 0;">ETH</span>
+                        </div>
+                        <div class="invalid-feedback">Please enter a valid positive ETH budget.</div>
+                        <small class="text-muted-custom" style="font-size: 0.75rem;">
+                          Pre-filled from the 10 ETH campaign target. Editable.
+                        </small>
+                      </div>
+
+                      <!-- Campaign Objective -->
+                      <div class="mb-3">
+                        <label for="bpObjective" class="form-label fw-semibold small text-navy">Campaign Objective</label>
+                        <input type="text" class="form-control form-control-sm" id="bpObjective" value="Funding classroom supplies and teachers for rural students in India." required>
+                        <div class="invalid-feedback">Please provide the campaign objective.</div>
+                      </div>
+
+                      <!-- Expected Number of Beneficiaries -->
+                      <div class="mb-3">
+                        <label for="bpBeneficiaries" class="form-label fw-semibold small text-navy">Expected Beneficiaries</label>
+                        <input type="text" class="form-control form-control-sm" id="bpBeneficiaries" value="500" placeholder="e.g. 500 students" required>
+                        <div class="invalid-feedback">Please specify expected beneficiaries.</div>
+                      </div>
+
+                      <!-- Spending Priorities -->
+                      <div class="mb-3">
+                        <label for="bpPriorities" class="form-label fw-semibold small text-navy">Spending Priorities</label>
+                        <textarea class="form-control form-control-sm" id="bpPriorities" rows="3" placeholder="Specify items or focus areas..." required>Books, notebooks, school bags, teacher support and classroom improvements.</textarea>
+                        <div class="invalid-feedback">Please list key spending priorities.</div>
+                      </div>
+
+                      <!-- Action Buttons -->
+                      <div class="pt-2">
+                        <button type="submit" class="btn btn-emerald w-100 py-2 d-flex align-items-center justify-content-center fw-semibold rounded-pill" id="btnGenerateBudgetPlan">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="me-2">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                          </svg>
+                          <span>Generate AI Budget Plan</span>
+                        </button>
+                      </div>
+                    </form>
+
+                    <!-- Safety & Policy Note -->
+                    <div class="mt-4 p-3 rounded-3 bg-light border" style="font-size: 0.75rem;">
+                      <div class="d-flex align-items-start gap-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber flex-shrink-0 mt-0.5">
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="12" y1="8" x2="12" y2="12"/>
+                          <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <span class="text-muted-custom">
+                          <strong class="text-navy">Non-Transactional:</strong> Budget generation does not trigger blockchain transactions, sign with private keys, or auto-submit expense records. All expenses require explicit manual submission and administrator approval.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Column: Results / Plan Display -->
+                <div class="col-lg-7" id="budgetPlannerResultCol">
+                  <!-- Empty Initial State -->
+                  <div class="card p-5 rounded-4 bg-white border h-100 d-flex flex-column align-items-center justify-content-center text-center shadow-xs" id="bpEmptyState">
+                    <div class="stat-icon mb-3" style="background-color: var(--tf-blue-subtle); color: var(--tf-blue); width: 64px; height: 64px;">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                      </svg>
+                    </div>
+                    <h5 class="fw-bold text-navy mb-2">Ready to Formulate Campaign Budget</h5>
+                    <p class="text-muted-custom small max-w-md mb-4" style="max-width: 420px;">
+                      Configure your campaign goals on the left and click <strong>"Generate AI Budget Plan"</strong>. Gemini 3.6 Flash will evaluate your priorities and recommend a mathematically verified allocation across supported categories.
+                    </p>
+                    <div class="d-flex align-items-center gap-2 small text-muted">
+                      <span class="badge bg-light text-muted border">Deterministic Math</span>
+                      <span class="badge bg-light text-muted border">100% Sum Verification</span>
+                      <span class="badge bg-light text-muted border">Exact Single-Wei Remainder Handling</span>
+                    </div>
+                  </div>
+
+                  <!-- Loading State -->
+                  <div class="card p-5 rounded-4 bg-white border h-100 d-none flex-column align-items-center justify-content-center text-center shadow-xs" id="bpLoadingState">
+                    <div class="spinner-grow text-emerald mb-3" style="width: 3rem; height: 3rem;" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 class="fw-bold text-navy mb-2">Synthesizing AI Budget Allocation...</h5>
+                    <p class="text-muted-custom small mb-0" style="max-width: 420px;">
+                      Analyzing campaign objective, beneficiary scope, and priority weights across authorized categories...
+                    </p>
+                  </div>
+
+                  <!-- Populated Plan Panel -->
+                  <div class="card rounded-4 bg-white border h-100 shadow-xs d-none overflow-hidden" id="bpPlanPanel">
+                    <!-- Results Header & Admin Controls -->
+                    <div class="card-header bg-white border-bottom p-3 p-md-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                      <div>
+                        <div class="d-flex align-items-center gap-2">
+                          <h6 class="fw-bold text-navy mb-0" id="bpResultCampaignTitle">Education for All</h6>
+                          <span class="badge badge-emerald-soft" id="bpResultBudgetBadge">10 ETH Budget</span>
+                        </div>
+                        <small class="text-muted-custom" id="bpResultGeneratedAt">Generated just now</small>
+                      </div>
+                      <!-- 3 Required Admin Buttons: Generate Again, Edit Inputs, Clear Plan -->
+                      <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-outline-custom btn-sm rounded-pill d-flex align-items-center px-3" id="bpBtnEditInputs" title="Edit inputs form">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          </svg>
+                          <span>Edit Inputs</span>
+                        </button>
+                        <button type="button" class="btn btn-emerald btn-sm rounded-pill d-flex align-items-center px-3" id="bpBtnGenerateAgain" title="Re-run AI budget plan">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                          </svg>
+                          <span>Generate Again</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill d-flex align-items-center px-3" id="bpBtnClearPlan" title="Clear current budget plan">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                          <span>Clear Plan</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Results Scrollable Body -->
+                    <div class="card-body p-4" style="max-height: 650px; overflow-y: auto;">
+                      <!-- AI Summary -->
+                      <div class="mb-4 p-3 rounded-4 bg-light border">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                          <span class="badge badge-blue-soft">Strategic Executive Summary</span>
+                        </div>
+                        <p class="text-navy small mb-0" id="bpResultSummary"></p>
+                      </div>
+
+                      <!-- Visual Allocation Chart / Bar -->
+                      <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <span class="fw-bold text-navy small">Visual Allocation Distribution</span>
+                          <span class="text-muted-custom small" style="font-size: 0.75rem;">100% of Total Budget</span>
+                        </div>
+                        <!-- Multi-segment progress bar -->
+                        <div class="progress rounded-pill mb-2" style="height: 14px; background-color: #e2e8f0;" id="bpProgressBar">
+                          <!-- Filled dynamically with colorful segments -->
+                        </div>
+                        <!-- Legend -->
+                        <div class="d-flex flex-wrap gap-2 pt-1" id="bpChartLegend" style="font-size: 0.75rem;">
+                          <!-- Filled dynamically -->
+                        </div>
+                      </div>
+
+                      <!-- Category Allocation Table -->
+                      <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <span class="fw-bold text-navy small">Category Allocation &amp; Justifications</span>
+                          <span class="badge bg-light text-muted border small" id="bpTotalAllocatedDisplay">Total: 10 ETH (100%)</span>
+                        </div>
+                        <div class="table-responsive rounded-3 border">
+                          <table class="table table-sm table-hover align-middle mb-0" style="font-size: 0.82rem;">
+                            <thead class="table-light">
+                              <tr>
+                                <th>Category</th>
+                                <th>Share (%)</th>
+                                <th>Calculated ETH</th>
+                                <th>Priority</th>
+                                <th>AI Reason &amp; Impact</th>
+                              </tr>
+                            </thead>
+                            <tbody id="bpTableBody">
+                              <!-- Filled dynamically -->
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      <!-- Recommendations, Assumptions & Warnings Cards -->
+                      <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                          <div class="card p-3 rounded-4 bg-light border h-100">
+                            <strong class="text-navy small d-flex align-items-center gap-1 mb-2">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                              Key Recommendations
+                            </strong>
+                            <ul class="mb-0 ps-3 small text-muted-custom" id="bpRecommendationsList" style="font-size: 0.78rem;"></ul>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="card p-3 rounded-4 bg-light border h-100">
+                            <strong class="text-navy small d-flex align-items-center gap-1 mb-2">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                              </svg>
+                              Planning Assumptions
+                            </strong>
+                            <ul class="mb-0 ps-3 small text-muted-custom" id="bpAssumptionsList" style="font-size: 0.78rem;"></ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Warnings & Disclaimers -->
+                      <div class="alert alert-warning border-0 rounded-4 p-3 mb-0" style="font-size: 0.78rem;">
+                        <div class="d-flex align-items-start gap-2">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-warning flex-shrink-0 mt-0.5">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                          </svg>
+                          <div>
+                            <strong class="text-navy d-block mb-1">Accuracy Notice &amp; Safety Disclaimers</strong>
+                            <p class="mb-1 text-muted-custom" id="bpDisclaimersText">
+                              AI-generated budget recommendation – subject to administrator review. Sepolia test ETH has no real monetary value.
+                            </p>
+                            <ul class="mb-0 ps-3 text-muted-custom" id="bpWarningsList"></ul>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 

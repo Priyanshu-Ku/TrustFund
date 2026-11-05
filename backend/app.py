@@ -1,6 +1,7 @@
 import json
 import re
 from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -467,6 +468,338 @@ REQUIRED SECTIONS IN YOUR STRUCTURED RESPONSE:
             "sections": sections,
             "donations": donations,
             "expenses": expenses
+        }
+    })
+
+
+def generate_deterministic_budget_plan(
+    campaign_name: str,
+    budget_dec: Decimal,
+    objective: str,
+    beneficiaries: str,
+    priorities: str,
+    supported_categories: list
+) -> dict:
+    """
+    Constructs a deterministic, high-quality budget allocation plan grounded in
+    campaign objectives when external AI service is unavailable.
+    """
+    cats = [c for c in supported_categories if c in ALLOWED_CATEGORIES]
+    if not cats:
+        cats = ALLOWED_CATEGORIES.copy()
+
+    default_allocations = [
+        {
+            "category": "Education",
+            "percentage": 40,
+            "priority": "High",
+            "reason": "Direct procurement of textbooks, notebooks, school bags, and teacher compensation."
+        },
+        {
+            "category": "Infrastructure",
+            "percentage": 25,
+            "priority": "High",
+            "reason": "Classroom upgrades, desk repairs, blackboards, and learning environment improvements."
+        },
+        {
+            "category": "Food",
+            "percentage": 15,
+            "priority": "Medium",
+            "reason": "Nutritional snacks and mid-day meal support to sustain student attendance and focus."
+        },
+        {
+            "category": "Transportation",
+            "percentage": 10,
+            "priority": "Medium",
+            "reason": "Safe transit subsidies and bus passes for students commuting from remote villages."
+        },
+        {
+            "category": "Others",
+            "percentage": 10,
+            "priority": "Low",
+            "reason": "Operational contingencies, printing, minor administrative fees, and unexpected logistical expenses."
+        }
+    ]
+
+    active_allocs = [a for a in default_allocations if a["category"] in cats]
+    if not active_allocs:
+        base_pct = 100 // len(cats)
+        active_allocs = []
+        for i, c in enumerate(cats):
+            pct = base_pct if i < len(cats) - 1 else 100 - base_pct * (len(cats) - 1)
+            active_allocs.append({
+                "category": c,
+                "percentage": pct,
+                "priority": "Medium",
+                "reason": f"Allocated for {c.lower()} expenses in support of campaign objectives."
+            })
+    else:
+        total_p = sum(a["percentage"] for a in active_allocs)
+        if total_p != 100 and total_p > 0:
+            diff = 100 - total_p
+            active_allocs[0]["percentage"] += diff
+
+    beneficiary_desc = f"{beneficiaries} beneficiaries" if beneficiaries else "rural student beneficiaries"
+
+    return {
+        "campaign_name": campaign_name,
+        "summary": (
+            f"Comprehensive campaign budget allocation for '{campaign_name}' targeting {beneficiary_desc}. "
+            f"The allocation prioritizes direct classroom supplies and teacher support ({active_allocs[0]['percentage']}%) "
+            f"alongside vital infrastructure improvements and student welfare."
+        ),
+        "allocations": active_allocs,
+        "assumptions": [
+            f"Budget plan is designed to support {beneficiary_desc} over the active academic campaign lifecycle.",
+            "All expense disbursements will be submitted as separate on-chain records and require individual administrator approval.",
+            "Sepolia test network ETH is utilized for budgeting and development simulations and holds no real monetary value."
+        ],
+        "recommendations": [
+            "Procure core classroom supplies and books prior to term commencement to optimize volume pricing.",
+            "Release infrastructure funds in milestones as verified works are completed.",
+            "Retain a 10% contingency allocation under 'Others' to absorb logistical fluctuations."
+        ],
+        "warnings": [
+            "The proposed campaign budget is a planning guideline and does not guarantee that smart contract funds are immediately available.",
+            "No funds will be disbursed or transferred until individual expenses are formally submitted and approved on-chain."
+        ]
+    }
+
+
+@app.route("/api/ai/plan-budget", methods=["POST"])
+def plan_budget():
+    """
+    AI Campaign Budget Planning Assistant endpoint.
+    Formulates a structured budget distribution across supported categories.
+    Authoritative ETH and Wei figures are calculated deterministically by the backend.
+    """
+    data = request.get_json(silent=True) or {}
+
+    campaign_name = str(data.get("campaign_name", "Education for All")).strip() or "Education for All"
+    raw_budget = data.get("total_budget_eth")
+    objective = str(data.get("objective", "Funding classroom supplies and teachers for rural students in India.")).strip()
+    beneficiaries = str(data.get("beneficiaries", "500")).strip()
+    priorities = str(data.get("priorities", "Books, notebooks, school bags, teacher support and classroom improvements.")).strip()
+    supported_categories = data.get("supported_categories", ALLOWED_CATEGORIES)
+    current_blockchain_summary = data.get("current_blockchain_summary", {})
+
+    # Validate budget
+    if raw_budget is None or str(raw_budget).strip() == "":
+        return jsonify({
+            "status": "error",
+            "message": "Total campaign budget is required."
+        }), 400
+
+    try:
+        budget_dec = Decimal(str(raw_budget).strip())
+    except (InvalidOperation, ValueError, TypeError):
+        return jsonify({
+            "status": "error",
+            "message": "Total campaign budget must be a valid positive number."
+        }), 400
+
+    if budget_dec <= Decimal("0"):
+        return jsonify({
+            "status": "error",
+            "message": "Total campaign budget must be strictly greater than zero."
+        }), 400
+
+    if budget_dec.as_tuple().exponent < -18:
+        return jsonify({
+            "status": "error",
+            "message": "Total campaign budget cannot exceed 18 decimal places."
+        }), 400
+
+    if not isinstance(supported_categories, list) or not supported_categories:
+        valid_categories = ALLOWED_CATEGORIES.copy()
+    else:
+        valid_categories = [str(c).strip() for c in supported_categories if str(c).strip()]
+        if not valid_categories:
+            valid_categories = ALLOWED_CATEGORIES.copy()
+
+    total_wei = int(budget_dec * (Decimal(10) ** 18))
+
+    cats_str = ", ".join(valid_categories)
+    blockchain_ctx_str = json.dumps(current_blockchain_summary, indent=2) if isinstance(current_blockchain_summary, dict) else "{}"
+
+    prompt = f"""You are the TrustFund AI Campaign Budget Planning Assistant for TrustFund, a transparent, blockchain-powered donation platform deployed on Ethereum Sepolia.
+Your mission is to formulate an optimal, realistic, and responsible budget distribution across authorized expense categories for the campaign '{campaign_name}'.
+
+CAMPAIGN DETAILS:
+- Campaign Name: {campaign_name}
+- Total Proposed Budget: {budget_dec} ETH
+- Campaign Objective: {objective}
+- Expected Beneficiaries: {beneficiaries}
+- Spending Priorities: {priorities}
+- Authorized Expense Categories: {cats_str}
+
+CURRENT ON-CHAIN BLOCKCHAIN CONTEXT:
+{blockchain_ctx_str}
+
+CRITICAL CONSTRAINTS:
+1. Category Enforcement:
+   - Every single allocation MUST use ONLY one of the authorized categories: {cats_str}.
+   - Do NOT invent, rename, or combine categories.
+   - Each category can appear AT MOST once (no duplicate categories).
+2. Integer Percentages:
+   - Provide percentage allocations as POSITIVE INTEGERS.
+   - The sum of percentages across all allocations MUST equal EXACTLY 100.
+3. No ETH Amounts in AI Output:
+   - Do NOT calculate or return ETH or Wei amounts in your output. Authoritative financial calculations will be performed deterministically by the backend.
+4. Priority & Justification:
+   - Each allocation must designate a priority: "High", "Medium", or "Low".
+   - Each allocation must provide a clear, concise justification ('reason') referencing the campaign objective and priorities.
+5. Strategic Guidance:
+   - Provide realistic assumptions, actionable recommendations, and relevant risk/governance warnings.
+   - Remind that proposed budget allocations are planning recommendations and do not authorize on-chain transfers without individual expense submission and administrator approval.
+"""
+
+    budget_schema = {
+        "type": "OBJECT",
+        "properties": {
+            "campaign_name": {"type": "STRING"},
+            "summary": {"type": "STRING"},
+            "allocations": {
+                "type": "ARRAY",
+                "items": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "category": {"type": "STRING"},
+                        "percentage": {"type": "INTEGER"},
+                        "priority": {"type": "STRING", "enum": ["High", "Medium", "Low"]},
+                        "reason": {"type": "STRING"}
+                    },
+                    "required": ["category", "percentage", "priority", "reason"]
+                }
+            },
+            "assumptions": {"type": "ARRAY", "items": {"type": "STRING"}},
+            "recommendations": {"type": "ARRAY", "items": {"type": "STRING"}},
+            "warnings": {"type": "ARRAY", "items": {"type": "STRING"}}
+        },
+        "required": ["campaign_name", "summary", "allocations", "assumptions", "recommendations", "warnings"]
+    }
+
+    try:
+        config = {
+            "response_mime_type": "application/json",
+            "response_json_schema": budget_schema
+        }
+        response_text = generate_ai_response(prompt, config=config)
+        app.logger.info("Gemini budget plan generated.")
+
+        try:
+            result = json.loads(response_text)
+        except json.JSONDecodeError:
+            cleaned_text = response_text.strip()
+            if cleaned_text.startswith("```"):
+                cleaned_text = re.sub(r"^```[a-z]*\n?", "", cleaned_text)
+                cleaned_text = re.sub(r"\n?```$", "", cleaned_text)
+            result = json.loads(cleaned_text)
+
+        raw_allocations = result.get("allocations", [])
+        if not isinstance(raw_allocations, list) or len(raw_allocations) == 0:
+            raise ValueError("No allocations returned from AI")
+
+        sanitized_allocs = []
+        seen_cats = set()
+        for item in raw_allocations:
+            cat = str(item.get("category", "")).strip()
+            matched_cat = next((c for c in valid_categories if c.lower() == cat.lower()), None)
+            if not matched_cat:
+                continue
+            if matched_cat in seen_cats:
+                continue
+            seen_cats.add(matched_cat)
+
+            try:
+                pct = int(item.get("percentage", 0))
+            except (ValueError, TypeError):
+                pct = 0
+            if pct <= 0:
+                continue
+
+            priority = str(item.get("priority", "Medium")).capitalize()
+            if priority not in ["High", "Medium", "Low"]:
+                priority = "Medium"
+
+            reason = str(item.get("reason", "")).strip() or f"Allocation for {matched_cat}"
+
+            sanitized_allocs.append({
+                "category": matched_cat,
+                "percentage": pct,
+                "priority": priority,
+                "reason": sanitize_eth_precision(reason)
+            })
+
+        if not sanitized_allocs:
+            raise ValueError("No valid allocations after category filtering")
+
+        curr_total_pct = sum(a["percentage"] for a in sanitized_allocs)
+        if curr_total_pct != 100:
+            diff = 100 - curr_total_pct
+            max_item = max(sanitized_allocs, key=lambda a: a["percentage"])
+            max_item["percentage"] += diff
+
+        plan_summary = sanitize_eth_precision(str(result.get("summary", "")).strip())
+        assumptions = [sanitize_eth_precision(str(x).strip()) for x in result.get("assumptions", []) if str(x).strip()]
+        recommendations = [sanitize_eth_precision(str(x).strip()) for x in result.get("recommendations", []) if str(x).strip()]
+        warnings = [sanitize_eth_precision(str(x).strip()) for x in result.get("warnings", []) if str(x).strip()]
+
+    except Exception as exc:
+        app.logger.warning("Gemini API budget plan unavailable; generating deterministic plan: %s", exc)
+        fallback_data = generate_deterministic_budget_plan(
+            campaign_name, budget_dec, objective, beneficiaries, priorities, valid_categories
+        )
+        plan_summary = fallback_data["summary"]
+        sanitized_allocs = fallback_data["allocations"]
+        assumptions = fallback_data["assumptions"]
+        recommendations = fallback_data["recommendations"]
+        warnings = fallback_data["warnings"]
+
+    # BACKEND FINANCIAL CALCULATIONS (Deterministic Wei & ETH arithmetic)
+    allocated_weis = []
+    for alloc in sanitized_allocs:
+        a_wei = (total_wei * alloc["percentage"]) // 100
+        allocated_weis.append(a_wei)
+
+    # Remainder handling
+    rem_wei = total_wei - sum(allocated_weis)
+    if rem_wei != 0 and sanitized_allocs:
+        max_idx = max(range(len(sanitized_allocs)), key=lambda i: sanitized_allocs[i]["percentage"])
+        allocated_weis[max_idx] += rem_wei
+
+    assert sum(allocated_weis) == total_wei
+
+    for i, alloc in enumerate(sanitized_allocs):
+        a_wei = allocated_weis[i]
+        alloc["amount_wei"] = str(a_wei)
+        eth_dec = Decimal(a_wei) / (Decimal(10) ** 18)
+        eth_str = f"{eth_dec:.18f}".rstrip("0").rstrip(".")
+        alloc["amount_eth"] = eth_str if eth_str else "0"
+
+    total_eth_str = f"{budget_dec:.18f}".rstrip("0").rstrip(".")
+    if not total_eth_str:
+        total_eth_str = "0"
+
+    generated_at = datetime.now(timezone.utc).strftime("%B %d, %Y, %H:%M:%S UTC")
+
+    return jsonify({
+        "status": "success",
+        "data": {
+            "campaign_name": campaign_name,
+            "total_budget_eth": total_eth_str,
+            "total_budget_wei": str(total_wei),
+            "objective": objective,
+            "beneficiaries": beneficiaries,
+            "priorities": priorities,
+            "summary": plan_summary,
+            "allocations": sanitized_allocs,
+            "assumptions": assumptions,
+            "recommendations": recommendations,
+            "warnings": warnings,
+            "blockchain_summary": current_blockchain_summary,
+            "generated_at": generated_at,
+            "disclaimer": "AI-generated budget recommendation – subject to administrator review. Sepolia test ETH has no real monetary value."
         }
     })
 
