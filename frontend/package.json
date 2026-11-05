@@ -12,6 +12,7 @@
     "vite": "^8.3.5"
   },
   "dependencies": {
+    "animejs": "^4.5.0",
     "bootstrap": "^5.3.8",
     "ethers": "^6.17.0"
   }

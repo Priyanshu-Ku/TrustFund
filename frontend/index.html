@@ -5,7 +5,23 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" id="metaThemeColor" />
   <title>TrustFund – Transparent Donation Tracking</title>
+  <!-- Anti-FOUC Theme Preloader: Restore user theme immediately before DOM paint -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme') || localStorage.getItem('trustfund-theme');
+        if (saved === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          var meta = document.getElementById('metaThemeColor');
+          if (meta) meta.setAttribute('content', '#07110E');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,6 +73,24 @@
 
         <!-- Top Right Actions & Quick Stats (like reference screenshot) -->
         <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+          <!-- Global Theme Toggle Button -->
+          <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Switch to Dark Mode" title="Switch to Dark Mode">
+            <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+
           <div class="nav-stat-pill d-none d-md-inline-flex">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5">
               <circle cx="12" cy="12" r="10" />
@@ -94,8 +128,8 @@
           </span>
           <span>Total TrustFund Impact Pool</span>
         </div>
-        <div class="hero-big-number" id="home-hero-amount">2.50 ETH</div>
-        <div class="hero-usd-subtext" id="home-hero-usd">≈ $8,450.00 USD Tracked in Real-Time</div>
+        <div class="hero-big-number" id="home-hero-amount">0.00 ETH</div>
+        <div class="hero-usd-subtext" id="home-hero-usd">≈ $0.00 USD Tracked in Real-Time</div>
         <div class="d-flex gap-2 justify-content-center flex-wrap mt-3">
           <button class="btn btn-white-pill px-4" data-section="donor">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -167,9 +201,9 @@
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <div>
                   <span class="text-muted-custom small fw-semibold text-uppercase">Featured Campaign Target</span>
-                  <h3 class="fw-bold text-navy mt-1 mb-0" id="campaign-raised">2.50 ETH</h3>
+                  <h3 class="fw-bold text-navy mt-1 mb-0" id="campaign-raised">0.00 ETH</h3>
                 </div>
-                <span class="badge badge-emerald-soft" id="campaign-percent-badge">+25% Achieved</span>
+                <span class="badge badge-emerald-soft" id="campaign-percent-badge">0% Achieved</span>
               </div>
               <p class="text-muted-custom small">Goal: <strong class="text-navy">10.00 ETH</strong> (Smart Contract
                 Vault)</p>
@@ -177,11 +211,11 @@
               <!-- Modern Progress Bar -->
               <div class="mt-4 mb-2">
                 <div class="d-flex justify-content-between small fw-bold mb-1">
-                  <span class="text-emerald">25% Funded</span>
+                  <span class="text-emerald" id="campaign-percent-label">0% Funded</span>
                   <span class="text-muted-custom">Goal: 10 ETH</span>
                 </div>
                 <div class="progress">
-                  <div class="progress-bar" role="progressbar" id="campaign-progress-bar" style="width: 25%"></div>
+                  <div class="progress-bar" role="progressbar" id="campaign-progress-bar" style="width: 0%"></div>
                 </div>
               </div>
             </div>
@@ -215,12 +249,12 @@
         <div class="col-lg-4 col-md-6">
           <div class="card card-dark-navy p-4 h-100 d-flex flex-column justify-content-between">
             <div>
-              <span class="text-light small text-uppercase fw-semibold">On-Chain Ledger</span>
-              <h5 class="fw-bold mt-1 text-white">Transactions Confirmed</h5>
+              <span class="card-lead-label small text-uppercase fw-semibold">On-Chain Ledger</span>
+              <h5 class="fw-bold mt-1 card-heading">Transactions Confirmed</h5>
             </div>
             <div class="d-flex align-items-center justify-content-between my-3">
-              <span class="badge-amber-big" id="home-reconciled-count">4</span>
-              <span class="text-light small">100% Immutable<br>On Ethereum</span>
+              <span class="badge-amber-big" id="home-reconciled-count">0</span>
+              <span class="card-sub-info small">100% Immutable<br>On Ethereum</span>
             </div>
             <div class="pt-2">
               <a href="#" class="text-decoration-none text-emerald fw-bold small d-inline-flex align-items-center"
@@ -240,37 +274,37 @@
           <div class="card p-4 h-100 d-flex flex-column justify-content-between">
             <div class="d-flex justify-content-between align-items-center">
               <span class="text-muted-custom small fw-semibold text-uppercase">Allocation Status</span>
-              <span class="badge badge-amber-soft">40% Utilized</span>
+              <span class="badge badge-emerald-soft" id="home-utilization-badge">0% Utilized</span>
             </div>
             <div class="my-3">
-              <h3 class="fw-bold text-navy mb-1" id="home-total-donations">2.50 ETH</h3>
-              <span class="text-muted-custom small">Total capital received from donors</span>
+              <h3 class="fw-bold text-navy mb-1" id="home-total-donations">0.00 ETH</h3>
+              <span class="text-muted-custom small" id="home-utilization-label">Loading on-chain utilization...</span>
             </div>
-            <div class="segmented-progress">
-              <div class="seg active-amber"></div>
-              <div class="seg active-amber"></div>
-              <div class="seg active-emerald"></div>
-              <div class="seg active-emerald"></div>
-              <div class="seg active-emerald"></div>
+            <div class="segmented-progress" id="home-utilization-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <div class="seg"></div>
+              <div class="seg"></div>
+              <div class="seg"></div>
+              <div class="seg"></div>
+              <div class="seg"></div>
             </div>
           </div>
         </div>
 
-        <!-- White Metric Card 2: AI Anomaly Monitor -->
+        <!-- White Metric Card 2: AI Assistance -->
         <div class="col-lg-4 col-md-12">
           <div class="card p-4 h-100 d-flex flex-column justify-content-between">
             <div class="d-flex justify-content-between align-items-center">
-              <span class="text-muted-custom small fw-semibold text-uppercase">AI Safety Guard</span>
-              <span class="badge badge-emerald-soft">0 Flags</span>
+              <span class="text-muted-custom small fw-semibold text-uppercase">AI Assistance</span>
+              <span class="badge badge-emerald-soft">Gemini 3.6 Flash</span>
             </div>
             <div class="my-3">
               <div class="d-flex align-items-center">
-                <h3 class="fw-bold text-navy mb-0 me-2" id="home-total-count">4</h3>
-                <span class="text-muted-custom small">verified transfers</span>
+                <h3 class="fw-bold text-navy mb-0 me-2" id="home-total-count">0</h3>
+                <span class="text-muted-custom small" id="home-total-count-unit">on-chain records</span>
               </div>
-              <span class="text-emerald small fw-semibold">✓ Normal spending patterns detected</span>
+              <span class="text-emerald small fw-semibold" id="home-ai-status-text">✓ Real-time donor intelligence &amp; audit reports</span>
             </div>
-            <div class="segmented-progress">
+            <div class="segmented-progress" id="home-ai-progress" role="progressbar" aria-valuenow="100">
               <div class="seg active-emerald"></div>
               <div class="seg active-emerald"></div>
               <div class="seg active-emerald"></div>
@@ -322,9 +356,9 @@
                   <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
                 </svg>
               </div>
-              <h5>3. AI-Audited Utilization</h5>
-              <p class="text-muted-custom small mb-0">NGOs submit itemized expenses. Our Isolation Forest AI flags
-                irregularities before release.</p>
+              <h5>3. AI-Assisted Accountability</h5>
+              <p class="text-muted-custom small mb-0">NGOs submit itemized expenses categorized with AI. Donors explore
+                fund utilization via real-time AI assistance and reports.</p>
             </div>
           </div>
         </div>
@@ -336,25 +370,22 @@
           <div class="row align-items-center">
             <div class="col-lg-7">
               <span class="badge badge-emerald-soft mb-2">About The Project</span>
-              <h2 class="section-title mb-3">Eliminating Blind Faith with Transparent Blockchain Tech</h2>
+              <h2 class="section-title mb-3">Transparent Donation Tracking Powered by Blockchain &amp; AI</h2>
               <p class="text-muted-custom mb-4">
-                Traditional charities lack transparent, granular tracking of how donated funds are spent. TrustFund
-                resolves this by combining <strong>Ethereum smart contracts</strong> for tamper-proof transaction
-                recording and <strong>machine learning algorithms</strong> to detect anomalous expense reports
-                automatically.
+                TrustFund combines blockchain technology and generative AI to improve donation transparency, simplify NGO expense management and help donors understand fund utilization.
               </p>
               <div class="d-flex gap-3 flex-wrap">
                 <div class="p-3 bg-light rounded-4 border flex-grow-1 text-center">
-                  <h5 class="fw-bold text-navy mb-0">100%</h5>
-                  <small class="text-muted-custom">On-Chain Audit</small>
+                  <h5 class="fw-bold text-navy mb-0">Sepolia</h5>
+                  <small class="text-muted-custom">Smart Contract Vault</small>
                 </div>
                 <div class="p-3 bg-light rounded-4 border flex-grow-1 text-center">
                   <h5 class="fw-bold text-emerald mb-0">Real-Time</h5>
                   <small class="text-muted-custom">Expense Tracking</small>
                 </div>
                 <div class="p-3 bg-light rounded-4 border flex-grow-1 text-center">
-                  <h5 class="fw-bold text-navy mb-0">Phase 1</h5>
-                  <small class="text-muted-custom">Frontend Complete</small>
+                  <h5 class="fw-bold text-navy mb-0">AI-Powered</h5>
+                  <small class="text-muted-custom">Transparency &amp; Reports</small>
                 </div>
               </div>
             </div>
@@ -369,8 +400,8 @@
                   </svg>
                 </div>
                 <h5 class="fw-bold text-navy mb-1">TrustFund Vault Core</h5>
-                <p class="text-muted-custom small mb-2">Sepolia Ethereum Testnet Ready</p>
-                <span class="badge badge-emerald-soft">Smart Contract Architecture</span>
+                <p class="text-muted-custom small mb-2">Deployed on Ethereum Sepolia</p>
+                <span class="badge badge-emerald-soft">Smart Contract Verified</span>
               </div>
             </div>
           </div>
@@ -382,7 +413,7 @@
     <!-- Site Footer -->
     <footer class="site-footer">
       <div class="container">
-        <div class="row g-4">
+        <div class="row g-4 align-items-start">
           <div class="col-md-5">
             <div class="d-flex align-items-center mb-3">
               <div class="brand-icon me-2" style="width: 28px; height: 28px;">
@@ -396,30 +427,33 @@
               <span class="fw-bold text-navy">TrustFund</span>
             </div>
             <p class="text-muted-custom small mb-0" style="max-width: 380px;">
-              AI-Powered Transparent Donation Tracking Using Blockchain Technology. College blockchain course project.
+              TrustFund combines blockchain technology and generative AI to improve donation transparency, simplify NGO expense management and help donors understand fund utilization.
             </p>
           </div>
-          <div class="col-md-4">
-            <h6>Engineering Stack</h6>
-            <ul class="list-unstyled">
-              <li>Ethereum Solidity Smart Contracts</li>
-              <li>MetaMask &amp; Ethers.js (Phase 2)</li>
-              <li>Python Flask &amp; Isolation Forest ML</li>
-              <li>HTML5, CSS3, Bootstrap 5 &amp; Vite</li>
+          <div class="col-md-3">
+            <h6 class="fw-bold text-navy mb-3">Navigation</h6>
+            <ul class="list-unstyled small mb-0">
+              <li class="mb-2"><a href="#" class="text-muted-custom text-decoration-none" data-section="home">Home</a></li>
+              <li class="mb-2"><a href="#" class="text-muted-custom text-decoration-none" data-section="donor">Donor Dashboard</a></li>
+              <li class="mb-2"><a href="#" class="text-muted-custom text-decoration-none" data-section="ngo">NGO Admin</a></li>
+              <li><a href="#" class="text-muted-custom text-decoration-none" data-section="transparency">Public Transparency</a></li>
             </ul>
           </div>
-          <div class="col-md-3">
-            <h6>Milestone Roadmap</h6>
-            <ul class="list-unstyled">
-              <li><strong class="text-emerald">✓ Phase 1:</strong> Frontend UI &amp; Mock Services</li>
-              <li><strong>Phase 2:</strong> Smart Contracts &amp; ML Model</li>
-              <li><strong>Phase 3:</strong> Full Sepolia Testnet Deployment</li>
-            </ul>
+          <div class="col-md-4">
+            <h6 class="fw-bold text-navy mb-3">Ethereum Sepolia Testnet</h6>
+            <p class="text-muted-custom small mb-2">
+              Connected to Ethereum Sepolia testnet (Chain ID: <code>11155111</code>).
+            </p>
+            <p class="text-muted-custom small mb-0">
+              Contract: <a href="https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4" target="_blank" rel="noopener noreferrer" class="font-monospace text-emerald text-decoration-none">0xd279...5cc4 ↗</a>
+            </p>
+            <small class="text-muted-custom d-block mt-2" style="font-size: 0.72rem;">
+              * Sepolia is an Ethereum test network. Test ETH has no real monetary value.
+            </small>
           </div>
         </div>
         <hr class="my-4 text-muted" style="opacity: 0.15;">
-        <p class="text-center text-muted-custom small mb-0">&copy; 2026 TrustFund. College Blockchain Course Project –
-          For Educational Purposes Only.</p>
+        <p class="text-center text-muted-custom small mb-0">&copy; 2026 TrustFund. All rights reserved.</p>
       </div>
     </footer>
   </section>
@@ -1040,10 +1074,20 @@
                     </div>
 
                     <form id="budgetPlannerForm" novalidate>
+                      <!-- Helper guidance note -->
+                      <div class="mb-3 p-2 rounded-3 bg-light border text-muted-custom small" style="font-size: 0.75rem;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1 text-emerald">
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="12" y1="16" x2="12" y2="12"/>
+                          <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        <span>Examples are provided to guide your input. Enter your own campaign details.</span>
+                      </div>
+
                       <!-- Campaign Name -->
                       <div class="mb-3">
                         <label for="bpCampaignName" class="form-label fw-semibold small text-navy">Campaign Name</label>
-                        <input type="text" class="form-control form-control-sm" id="bpCampaignName" value="Education for All" required>
+                        <input type="text" class="form-control form-control-sm" id="bpCampaignName" placeholder="e.g. Education for All" required>
                         <div class="invalid-feedback">Please enter the campaign name.</div>
                       </div>
 
@@ -1051,33 +1095,30 @@
                       <div class="mb-3">
                         <label for="bpTotalBudget" class="form-label fw-semibold small text-navy">Total Campaign Budget (ETH)</label>
                         <div class="input-group input-group-sm">
-                          <input type="number" class="form-control" id="bpTotalBudget" value="10" step="any" min="0.0001" placeholder="e.g. 10" required>
+                          <input type="number" class="form-control" id="bpTotalBudget" step="any" min="0.0001" placeholder="e.g. 10" required>
                           <span class="input-group-text bg-light fw-bold text-navy border-start-0" style="border-radius: 0 14px 14px 0;">ETH</span>
                         </div>
                         <div class="invalid-feedback">Please enter a valid positive ETH budget.</div>
-                        <small class="text-muted-custom" style="font-size: 0.75rem;">
-                          Pre-filled from the 10 ETH campaign target. Editable.
-                        </small>
                       </div>
 
                       <!-- Campaign Objective -->
                       <div class="mb-3">
                         <label for="bpObjective" class="form-label fw-semibold small text-navy">Campaign Objective</label>
-                        <input type="text" class="form-control form-control-sm" id="bpObjective" value="Funding classroom supplies and teachers for rural students in India." required>
+                        <input type="text" class="form-control form-control-sm" id="bpObjective" placeholder="e.g. Funding classroom supplies and teachers for rural students." required>
                         <div class="invalid-feedback">Please provide the campaign objective.</div>
                       </div>
 
                       <!-- Expected Number of Beneficiaries -->
                       <div class="mb-3">
                         <label for="bpBeneficiaries" class="form-label fw-semibold small text-navy">Expected Beneficiaries</label>
-                        <input type="text" class="form-control form-control-sm" id="bpBeneficiaries" value="500" placeholder="e.g. 500 students" required>
+                        <input type="text" class="form-control form-control-sm" id="bpBeneficiaries" placeholder="e.g. 500" required>
                         <div class="invalid-feedback">Please specify expected beneficiaries.</div>
                       </div>
 
                       <!-- Spending Priorities -->
                       <div class="mb-3">
                         <label for="bpPriorities" class="form-label fw-semibold small text-navy">Spending Priorities</label>
-                        <textarea class="form-control form-control-sm" id="bpPriorities" rows="3" placeholder="Specify items or focus areas..." required>Books, notebooks, school bags, teacher support and classroom improvements.</textarea>
+                        <textarea class="form-control form-control-sm" id="bpPriorities" rows="3" placeholder="e.g. Books, notebooks, school bags, teacher support and classroom improvements." required></textarea>
                         <div class="invalid-feedback">Please list key spending priorities.</div>
                       </div>
 
@@ -1294,36 +1335,22 @@
   <section id="section-transparency" class="page-section" style="display:none;">
     <div class="container py-4">
 
-      <!-- Header Row -->
+      <!-- Section A: Page Header -->
       <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <div>
-          <h2 class="section-title mb-1">Public Transparency Audit</h2>
-          <p class="text-muted-custom mb-0">Public cryptographic verification of all incoming donations and reported
-            expenses</p>
-          <p class="text-muted-custom mb-0">Public cryptographic verification of all incoming donations and reported
-            expenses on Sepolia</p>
+          <h2 class="section-title mb-1">Public Transparency</h2>
+          <p class="text-muted-custom mb-0">Explore donations, expenses and fund utilization recorded on Ethereum Sepolia.</p>
         </div>
-        <span class="badge badge-emerald-soft px-3 py-2">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            class="me-1">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
-          Public Ledger
-        </span>
-        <div class="d-flex align-items-center gap-2">
-          <span class="badge badge-emerald-soft px-3 py-2">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              class="me-1">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <a href="https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4" target="_blank" rel="noopener noreferrer" class="badge badge-emerald-soft px-3 py-2 text-decoration-none">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-1">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
               <circle cx="12" cy="12" r="3" />
             </svg>
-            Ethereum Sepolia Ledger
-          </span>
-          <button class="btn btn-emerald btn-sm px-3 rounded-pill d-flex align-items-center" id="transGenerateReportBtn"
-            title="Generate AI Financial Audit Report">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              class="me-1">
+            Ethereum Sepolia Ledger ↗
+          </a>
+          <button class="btn btn-emerald btn-sm px-3 rounded-pill d-flex align-items-center" id="transGenerateReportBtn" title="Generate AI Financial Report">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-1">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -1331,10 +1358,8 @@
             </svg>
             <span>AI Financial Report</span>
           </button>
-          <button class="btn btn-outline-custom btn-sm d-flex align-items-center" id="trans-refresh-btn"
-            title="Refresh blockchain data from Sepolia">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              class="me-1">
+          <button class="btn btn-outline-custom btn-sm d-flex align-items-center" id="trans-refresh-btn" title="Refresh blockchain data from Sepolia">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-1">
               <path d="M23 4v6h-6M1 20v-6h6" />
               <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
             </svg>
@@ -1343,356 +1368,260 @@
         </div>
       </div>
 
-      <!-- Stats Overview Cards -->
+      <!-- Section B: Financial Summary Cards (5 Smart Contract Metrics) -->
+      <div class="row g-3 mb-4">
+        <!-- 1. Total Donations -->
+        <div class="col-lg col-md-4 col-sm-6">
+          <div class="card stat-card p-3 h-100">
+            <div class="d-flex align-items-center">
+              <div class="stat-icon me-3 flex-shrink-0" style="background-color: var(--tf-emerald-subtle); color: var(--tf-emerald); width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6" />
+                </svg>
+              </div>
+              <div>
+                <div class="stat-label small">Total Donations</div>
+                <div class="stat-value text-emerald fs-6" id="trans-total-donations">0.0000 ETH</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Expenses Paid -->
+        <div class="col-lg col-md-4 col-sm-6">
+          <div class="card stat-card p-3 h-100">
+            <div class="d-flex align-items-center">
+              <div class="stat-icon me-3 flex-shrink-0" style="background-color: var(--tf-amber-subtle); color: var(--tf-amber); width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <div>
+                <div class="stat-label small">Expenses Paid</div>
+                <div class="stat-value text-amber fs-6" id="trans-total-expenses">0.0000 ETH</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Pending Expenses -->
+        <div class="col-lg col-md-4 col-sm-6">
+          <div class="card stat-card p-3 h-100">
+            <div class="d-flex align-items-center">
+              <div class="stat-icon me-3 flex-shrink-0" style="background-color: var(--tf-blue-subtle); color: var(--tf-blue); width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+              </div>
+              <div>
+                <div class="stat-label small">Pending Expenses</div>
+                <div class="stat-value text-warning fs-6" id="trans-pending-expenses">0.0000 ETH</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Contract Balance -->
+        <div class="col-lg col-md-6 col-sm-6">
+          <div class="card stat-card p-3 h-100">
+            <div class="d-flex align-items-center">
+              <div class="stat-icon me-3 flex-shrink-0" style="background-color: var(--tf-emerald-subtle); color: var(--tf-emerald); width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <rect x="2" y="6" width="20" height="14" rx="2" />
+                  <path d="M16 14h.01M2 10h20" />
+                </svg>
+              </div>
+              <div>
+                <div class="stat-label small">Contract Balance</div>
+                <div class="stat-value text-navy fs-6" id="trans-contract-balance">0.0000 ETH</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Available Balance -->
+        <div class="col-lg col-md-6 col-sm-12">
+          <div class="card stat-card p-3 h-100">
+            <div class="d-flex align-items-center">
+              <div class="stat-icon me-3 flex-shrink-0" style="background-color: var(--tf-blue-subtle); color: var(--tf-blue); width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                  <path d="M22 4L12 14.01l-3-3" />
+                </svg>
+              </div>
+              <div>
+                <div class="stat-label small">Available Balance</div>
+                <div class="stat-value text-emerald fs-6" id="trans-available-balance">0.0000 ETH</div>
+                <span class="d-none" id="trans-remaining-balance">0.0000 ETH</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section C: Fund Utilization -->
       <div class="row g-4 mb-4">
-        <div class="col-md-4">
-          <div class="card stat-card p-4">
-            <!-- Stats Overview Cards (5 Smart Contract Metrics) -->
-            <div class="row g-3 mb-4">
-              <!-- 1. Total Donations -->
-              <div class="col-lg col-md-4 col-sm-6">
-                <div class="card stat-card p-3 h-100">
-                  <div class="d-flex align-items-center">
-                    <div class="stat-icon me-3"
-                      style="background-color: var(--tf-emerald-subtle); color: var(--tf-emerald);">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.2">
-                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6" />
-                      </svg>
-                      <div class="stat-icon me-2 flex-shrink-0"
-                        style="background-color: var(--tf-emerald-subtle); color: var(--tf-emerald); width: 42px; height: 42px;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="2.2">
-                          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div class="stat-label">Total Donations</div>
-                        <div class="stat-value text-emerald" id="trans-total-donations">0 ETH</div>
-                        <div class="stat-label small">Total Donations</div>
-                        <div class="stat-value text-emerald fs-6" id="trans-total-donations">0.0000 ETH</div>
-                      </div>
-                    </div>
+        <!-- Left: Donut Chart -->
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Fund Utilization Breakdown</h5>
+              <span class="badge badge-emerald-soft" id="trans-utilization-badge">0% Utilized</span>
+            </div>
+            <div class="card-body d-flex justify-content-center align-items-center p-3 p-md-4">
+              <canvas id="fundChart" width="360" height="300" style="max-width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Capital Deployment Summary -->
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Capital Deployment Summary</h5>
+              <span class="badge badge-emerald-soft">Sepolia Verified</span>
+            </div>
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+              <div>
+                <p class="text-muted-custom small mb-3">
+                  TrustFund tracks every donation and disbursement on the Ethereum Sepolia blockchain. Fund utilization reflects the proportion of total donations already disbursed for verified campaign expenses.
+                </p>
+                <div class="p-3 bg-light rounded-3 border mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Total Donations Received:</span>
+                    <strong class="text-emerald font-monospace" id="trans-util-donations">0.0000 ETH</strong>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Expenses Paid Out:</span>
+                    <strong class="text-amber font-monospace" id="trans-util-expenses">0.0000 ETH</strong>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Remaining Vault Balance:</span>
+                    <strong class="text-navy font-monospace" id="trans-util-remaining">0.0000 ETH</strong>
+                  </div>
+                  <hr class="my-2">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-navy small">Fund Utilization Rate:</span>
+                    <strong class="text-emerald fs-6 font-monospace" id="trans-util-rate">0%</strong>
                   </div>
                 </div>
+              </div>
 
-                <div class="col-md-4">
-                  <div class="card stat-card p-4">
-                    <!-- 2. Total Expenses Paid -->
-                    <div class="col-lg col-md-4 col-sm-6">
-                      <div class="card stat-card p-3 h-100">
-                        <div class="d-flex align-items-center">
-                          <div class="stat-icon me-3"
-                            style="background-color: var(--tf-amber-subtle); color: var(--tf-amber);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2.2">
-                              <path
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
-                            <div class="stat-icon me-2 flex-shrink-0"
-                              style="background-color: var(--tf-amber-subtle); color: var(--tf-amber); width: 42px; height: 42px;">
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2.2">
-                                <path
-                                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                              </svg>
-                            </div>
-                            <div>
-                              <div class="stat-label">Total Expenses</div>
-                              <div class="stat-value text-navy" id="trans-total-expenses">0 ETH</div>
-                              <div class="stat-label small">Expenses Paid</div>
-                              <div class="stat-value text-navy fs-6" id="trans-total-expenses">0.0000 ETH</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+              <div class="alert alert-light border rounded-3 p-3 mb-0">
+                <div class="d-flex align-items-start">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 text-emerald flex-shrink-0 mt-1">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                  </svg>
+                  <div class="small text-muted-custom">
+                    <strong>Utilization Formula:</strong> <code>(Expenses Paid / Total Donations) &times; 100</code>. Calculations are derived directly from the immutable Sepolia smart contract state.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                      <div class="col-md-4">
-                        <div class="card stat-card p-4">
-                          <!-- 3. Pending Expenses -->
-                          <div class="col-lg col-md-4 col-sm-6">
-                            <div class="card stat-card p-3 h-100">
-                              <div class="d-flex align-items-center">
-                                <div class="stat-icon me-3"
-                                  style="background-color: var(--tf-blue-subtle); color: var(--tf-blue);">
-                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.2">
-                                    <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    <path d="M12 8v4l3 3" />
-                                  </svg>
-                                  <div class="stat-icon me-2 flex-shrink-0"
-                                    style="background-color: var(--tf-blue-subtle); color: var(--tf-blue); width: 42px; height: 42px;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                      stroke-width="2.2">
-                                      <circle cx="12" cy="12" r="10" />
-                                      <path d="M12 6v6l4 2" />
-                                    </svg>
-                                  </div>
-                                  <div>
-                                    <div class="stat-label">Remaining Balance</div>
-                                    <div class="stat-value text-navy" id="trans-remaining-balance">0 ETH</div>
-                                    <div class="stat-label small">Pending Expenses</div>
-                                    <div class="stat-value text-warning fs-6" id="trans-pending-expenses">0.0000 ETH
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
+      <!-- Section D & E: Detailed Transaction Tables -->
+      <div class="row g-4 mb-4">
+        <!-- Section D: Incoming Donations Table -->
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Incoming Donations</h5>
+              <span class="badge badge-emerald-soft" id="trans-donation-count">0 on-chain records</span>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-custom mb-0">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Date &amp; Time</th>
+                      <th>Donor Address</th>
+                      <th>Amount</th>
+                      <th>Sepolia Verification</th>
+                    </tr>
+                  </thead>
+                  <tbody id="transDonationBody">
+                  </tbody>
+                </table>
+              </div>
+              <div class="text-center py-5 d-none" id="transDonationEmptyState">
+                <p class="text-muted-custom mb-0">No on-chain donations found yet.</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                            <!-- 4. Contract Balance -->
-                            <div class="col-lg col-md-6 col-sm-6">
-                              <div class="card stat-card p-3 h-100">
-                                <div class="d-flex align-items-center">
-                                  <div class="stat-icon me-2 flex-shrink-0"
-                                    style="background-color: var(--tf-emerald-subtle); color: var(--tf-emerald); width: 42px; height: 42px;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                      stroke-width="2.2">
-                                      <rect x="2" y="6" width="20" height="14" rx="2" />
-                                      <path d="M16 14h.01M2 10h20" />
-                                    </svg>
-                                  </div>
-                                  <div>
-                                    <div class="stat-label small">Contract Balance</div>
-                                    <div class="stat-value text-navy fs-6" id="trans-contract-balance">0.0000 ETH</div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
+        <!-- Section E: Outgoing Expenses Table -->
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Outgoing Expenses</h5>
+              <span class="badge badge-amber-soft" id="trans-expense-count">0 on-chain records</span>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-custom mb-0">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Date</th>
+                      <th>Category</th>
+                      <th>Amount</th>
+                      <th>Recipient</th>
+                      <th>Status</th>
+                      <th>Sepolia Tx</th>
+                    </tr>
+                  </thead>
+                  <tbody id="transExpenseBody">
+                  </tbody>
+                </table>
+              </div>
+              <div class="text-center py-5 d-none" id="transExpenseEmptyState">
+                <p class="text-muted-custom mb-0">No on-chain expenses reported yet.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                            <!-- 5. Available Balance -->
-                            <div class="col-lg col-md-6 col-sm-12">
-                              <div class="card stat-card p-3 h-100">
-                                <div class="d-flex align-items-center">
-                                  <div class="stat-icon me-2 flex-shrink-0"
-                                    style="background-color: var(--tf-blue-subtle); color: var(--tf-blue); width: 42px; height: 42px;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                      stroke-width="2.2">
-                                      <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                                      <path d="M22 4L12 14.01l-3-3" />
-                                    </svg>
-                                  </div>
-                                  <div>
-                                    <div class="stat-label small">Available Balance</div>
-                                    <div class="stat-value text-emerald fs-6" id="trans-available-balance">0.0000 ETH
-                                    </div>
-                                    <span class="d-none" id="trans-remaining-balance">0.0000 ETH</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+      <!-- Section F: Smart Contract Information -->
+      <div class="card p-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon flex-shrink-0" style="background-color: var(--tf-emerald-subtle); color: var(--tf-emerald); width: 48px; height: 48px; border-radius: 14px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="M9 12l2 2 4-4" />
+              </svg>
+            </div>
+            <div>
+              <h5 class="fw-bold text-navy mb-1">Smart Contract: DonationTracker</h5>
+              <div class="d-flex align-items-center gap-2 flex-wrap small">
+                <span class="badge badge-emerald-soft">Ethereum Sepolia</span>
+                <span class="badge badge-blue-soft">Chain ID: 11155111</span>
+                <span class="text-muted-custom">Address:</span>
+                <a href="https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4" target="_blank" rel="noopener noreferrer" class="font-monospace text-emerald fw-semibold text-decoration-none">
+                  0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4 ↗
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="text-md-end">
+            <a href="https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4" target="_blank" rel="noopener noreferrer" class="btn btn-outline-custom btn-sm px-3 mb-1">
+              View on Sepolia Etherscan ↗
+            </a>
+            <p class="text-muted-custom small mb-0">Sepolia is an Ethereum test network. Test ETH has no real monetary value.</p>
+          </div>
+        </div>
+      </div>
 
-                          <!-- Donut Chart & AI Alerts Panel -->
-                          <div class="row g-4 mb-4">
-                            <!-- Left: Canvas Donut Chart -->
-                            <div class="col-lg-6">
-                              <div class="card h-100">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                  <h5 class="mb-0">Fund Utilization Breakdown</h5>
-                                  <span class="badge badge-emerald-soft">Dynamic Calculation</span>
-                                  <span class="badge badge-emerald-soft" id="trans-utilization-badge">0% Utilized</span>
-                                </div>
-                                <div class="card-body d-flex justify-content-center align-items-center p-4">
-                                  <canvas id="fundChart" width="320" height="280"></canvas>
-                                </div>
-                              </div>
-                            </div>
-
-                            <!-- Right: AI Alerts Panel -->
-                            <div class="col-lg-6">
-                              <div class="card h-100">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                  <h5 class="mb-0">AI Sentinel &amp; Anomaly Status</h5>
-                                  <span class="badge badge-emerald-soft">Engine Online</span>
-                                  <span class="badge badge-amber-soft">Phase 5 Integration</span>
-                                </div>
-                                <div class="card-body p-4" id="aiAlertsContainer">
-                                  <div class="alert alert-warning border-0 rounded-4 p-3 mb-3 d-flex align-items-start">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706"
-                                      stroke-width="2" class="me-2 flex-shrink-0 mt-1">
-                                      <circle cx="12" cy="12" r="10" />
-                                      <path d="M12 16v-4M12 8h.01" />
-                                    </svg>
-                                    <div class="small">
-                                      <strong class="text-navy">AI Integration Pending:</strong> Isolation Forest
-                                      machine learning model will be connected in the next phase.
-                                    </div>
-                                  </div>
-
-                                  <div class="alert-item mb-3">
-                                    <div class="d-flex align-items-start">
-                                      <span class="badge badge-emerald-soft me-3 mt-1">✓</span>
-                                      <span class="badge badge-blue-soft me-3 mt-1">ℹ</span>
-                                      <div>
-                                        <h6 class="fw-bold text-navy mb-1">Baseline Auditing Passed</h6>
-                                        <p class="text-muted-custom small mb-0">All submitted expenses align with
-                                          typical disbursement envelopes. No anomalies detected.</p>
-                                        <h6 class="fw-bold text-navy mb-1">Isolation Forest Model</h6>
-                                        <p class="text-muted-custom small mb-0">Unsupervised outlier detection
-                                          algorithms will score expense categories, amount envelopes, and transaction
-                                          patterns in Phase 5.</p>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div class="alert-item mb-3">
-                                    <div class="d-flex align-items-start">
-                                      <span class="badge badge-blue-soft me-3 mt-1">ℹ</span>
-                                      <span class="badge badge-emerald-soft me-3 mt-1">✓</span>
-                                      <div>
-                                        <h6 class="fw-bold text-navy mb-1">Machine Learning Integration</h6>
-                                        <p class="text-muted-custom small mb-0">Isolation Forest unsupervised clustering
-                                          will score transaction risks in Phase 2.</p>
-                                        <h6 class="fw-bold text-navy mb-1">Ethereum Sepolia Consensus</h6>
-                                        <p class="text-muted-custom small mb-0">All current donations and disbursements
-                                          are recorded directly on the public Sepolia blockchain vault.</p>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div class="alert-item">
-                                    <div class="d-flex align-items-start">
-                                      <span class="badge badge-amber-soft me-3 mt-1">⚡</span>
-                                      <span class="badge badge-amber-soft me-3 mt-1">●</span>
-                                      <div>
-                                        <h6 class="fw-bold text-navy mb-1">Consensus Verification</h6>
-                                        <p class="text-muted-custom small mb-0">Ethereum Sepolia testnet validator
-                                          confirmation scheduled for Phase 2 deployment.</p>
-                                        <h6 class="fw-bold text-navy mb-1">Transparency Policy</h6>
-                                        <p class="text-muted-custom small mb-0">No simulated or synthetic predictions
-                                          are presented as actual AI audits until the Python Flask model backend is
-                                          live.</p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <!-- Detailed Transaction Tables -->
-                          <div class="row g-4 mb-4">
-                            <!-- Donations Table -->
-                            <div class="col-lg-6">
-                              <div class="card h-100">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                  <h5 class="mb-0">Incoming Donations</h5>
-                                  <span class="badge badge-emerald-soft" id="trans-donation-count">0 records</span>
-                                  <span class="badge badge-emerald-soft" id="trans-donation-count">0 on-chain
-                                    records</span>
-                                </div>
-                                <div class="card-body p-0">
-                                  <div class="table-responsive">
-                                    <table class="table table-custom">
-                                      <thead>
-                                        <tr>
-                                          <th>Date</th>
-                                          <th>Donor</th>
-                                          <th>Date &amp; Time</th>
-                                          <th>Donor Address</th>
-                                          <th>Amount</th>
-                                          <th>Audit</th>
-                                          <th>Sepolia Verification</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody id="transDonationBody">
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                  <div class="text-center py-5 d-none" id="transDonationEmptyState">
-                                    <p class="text-muted-custom mb-0">No on-chain donations found yet.</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <!-- Expenses Table -->
-                            <div class="col-lg-6">
-                              <div class="card h-100">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                  <h5 class="mb-0">Outflow Expenses</h5>
-                                  <span class="badge badge-amber-soft" id="trans-expense-count">0 records</span>
-                                  <span class="badge badge-amber-soft" id="trans-expense-count">0 on-chain
-                                    records</span>
-                                </div>
-                                <div class="card-body p-0">
-                                  <div class="table-responsive">
-                                    <table class="table table-custom">
-                                      <thead>
-                                        <tr>
-                                          <th>ID</th>
-                                          <th>Date</th>
-                                          <th>Category</th>
-                                          <th>Amount</th>
-                                          <th>Audit</th>
-                                          <th>Recipient</th>
-                                          <th>Status</th>
-                                          <th>Sepolia Tx</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody id="transExpenseBody">
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                  <div class="text-center py-5 d-none" id="transExpenseEmptyState">
-                                    <p class="text-muted-custom mb-0">No on-chain expenses reported yet.</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <!-- Blockchain Verification Placeholder -->
-                          <!-- Blockchain Verification Details -->
-                          <div class="card p-4 text-center">
-                            <div class="py-3">
-                              <div class="stat-icon mx-auto mb-3"
-                                style="background-color: var(--tf-blue-subtle); color: var(--tf-blue); width: 60px; height: 60px; border-radius: 18px;">
-                                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                  stroke-width="2">
-                                  <rect x="2" y="7" width="20" height="14" rx="2" />
-                                  <path d="M16 7V5a4 4 0 00-8 0v2" />
-                                  <circle cx="12" cy="15" r="1" />
-                                </svg>
-                                <div class="stat-icon mx-auto mb-3"
-                                  style="background-color: var(--tf-emerald-subtle); color: var(--tf-emerald); width: 60px; height: 60px; border-radius: 18px;">
-                                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                    <path d="M9 12l2 2 4-4" />
-                                  </svg>
-                                </div>
-                                <h5 class="fw-bold text-navy mb-1">Sepolia Smart Contract Vault</h5>
-                                <h5 class="fw-bold text-navy mb-1">Sepolia Smart Contract Vault Active</h5>
-                                <p class="text-muted-custom small mb-3">
-                                  Cryptographic verification via Ethereum Sepolia testnet contracts will be connected in
-                                  Phase 2.<br>
-                                  The verified contract address, Etherscan explorer link, and Merkle tree roots will be
-                                  displayed here.
-                                  Immutable ledger deployed on Ethereum Sepolia at block <code>12061871</code>.<br>
-                                  Contract Address:
-                                  <a href="https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4"
-                                    target="_blank" rel="noopener noreferrer"
-                                    class="font-monospace text-emerald fw-semibold text-decoration-none">
-                                    0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4 ↗
-                                  </a>
-                                </p>
-                                <span class="badge badge-blue-soft px-3 py-2">Ethereum Sepolia • Architecture Ready for
-                                  Phase 2</span>
-                                <div class="d-flex justify-content-center gap-2 flex-wrap">
-                                  <span class="badge badge-emerald-soft px-3 py-2">Ethereum Sepolia • Chain ID
-                                    11155111</span>
-                                  <span class="badge badge-blue-soft px-3 py-2">Solidity v0.8.24 Verified</span>
-                                  <a href="https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4"
-                                    target="_blank" rel="noopener noreferrer"
-                                    class="btn btn-outline-custom btn-sm px-3">
-                                    View Contract on Etherscan ↗
-                                  </a>
-                                </div>
-                              </div>
-                            </div>
-
-                          </div>
+    </div>
   </section>
 
   <!-- ==================== EXPENSE APPROVAL MODAL ==================== -->

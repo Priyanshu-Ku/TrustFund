@@ -18,6 +18,11 @@ import {
   SEPOLIA_CHAIN_ID
 } from '../services/blockchain.js';
 import { shortenAddress } from './donorDashboard.js';
+import {
+  animateChatbotOpen,
+  animateChatbotClose,
+  animateMessageBubble
+} from '../services/animationService.js';
 
 const EXPENSE_STATUS_LABELS = {
   0: 'Pending (Under Review)',
@@ -221,6 +226,7 @@ function appendMessage(sender, text, isHtml = false) {
   msgDiv.appendChild(timeDiv);
 
   container.appendChild(msgDiv);
+  animateMessageBubble(msgDiv);
   container.scrollTop = container.scrollHeight;
 }
 
@@ -246,6 +252,7 @@ function showTypingIndicator() {
 
   msgDiv.appendChild(bubble);
   container.appendChild(msgDiv);
+  animateMessageBubble(msgDiv);
   container.scrollTop = container.scrollHeight;
 
   return indicatorId;
@@ -335,22 +342,21 @@ export function initChatbot() {
   const toggleChat = () => {
     const isHidden = panel.classList.contains('d-none');
     if (isHidden) {
-      panel.classList.remove('d-none');
       toggleBtn.classList.add('active');
       const openIcon = toggleBtn.querySelector('.chatbot-toggle-icon');
       const closeIcon = toggleBtn.querySelector('.chatbot-toggle-close');
       if (openIcon) openIcon.classList.add('d-none');
       if (closeIcon) closeIcon.classList.remove('d-none');
-      setTimeout(() => {
+      animateChatbotOpen(panel, () => {
         if (input) input.focus();
-      }, 150);
+      });
     } else {
-      panel.classList.add('d-none');
       toggleBtn.classList.remove('active');
       const openIcon = toggleBtn.querySelector('.chatbot-toggle-icon');
       const closeIcon = toggleBtn.querySelector('.chatbot-toggle-close');
       if (openIcon) openIcon.classList.remove('d-none');
       if (closeIcon) closeIcon.classList.add('d-none');
+      animateChatbotClose(panel);
     }
   };
 

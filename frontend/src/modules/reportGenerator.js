@@ -19,6 +19,7 @@ import {
 import { shortenAddress } from './donorDashboard.js';
 import { cleanPrecisionArtifacts } from './chatbot.js';
 import { formatEther } from 'ethers';
+import { animatePanelEntrance } from '../services/animationService.js';
 
 // Application Configuration: Explicit Campaign Name
 export const CAMPAIGN_NAME = 'Education for All';
@@ -541,7 +542,10 @@ export async function generateFinancialReport() {
     renderReportSheet(data.data);
 
     if (loadingState) loadingState.classList.add('d-none');
-    if (contentSheet) contentSheet.classList.remove('d-none');
+    if (contentSheet) {
+      contentSheet.classList.remove('d-none');
+      animatePanelEntrance(contentSheet);
+    }
     if (downloadPdfBtn) downloadPdfBtn.disabled = false;
 
   } catch (err) {

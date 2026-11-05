@@ -28,6 +28,7 @@ import {
   SEPOLIA_CHAIN_ID
 } from '../services/blockchain.js';
 import { shortenAddress } from './donorDashboard.js';
+import { animatePanelEntrance } from '../services/animationService.js';
 
 // --- State Variables ---
 let currentIsAdmin = false;        // Holds verified on-chain admin status
@@ -579,7 +580,10 @@ async function handleAiSuggestCategory() {
     if (nameEl) nameEl.textContent = matchedCategory;
     if (subcatEl) subcatEl.textContent = data.subcategory;
     if (reasonEl) reasonEl.textContent = lastAiRecommendation.reason;
-    if (panelEl) panelEl.classList.remove('d-none');
+    if (panelEl) {
+      panelEl.classList.remove('d-none');
+      animatePanelEntrance(panelEl);
+    }
 
     showToast(
       `AI Recommendation: "${matchedCategory}" (${data.subcategory})`,

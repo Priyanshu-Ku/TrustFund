@@ -2,8 +2,11 @@
  * TrustFund – Navigation Module
  * ==============================
  * Handles SPA-style navigation between the four sections.
- * Sections are shown/hidden with display toggle.
+ * Sections are shown/hidden with display toggle and smooth Anime.js transitions.
  */
+
+import { animatePageTransition, animateCardStagger } from '../services/animationService.js';
+import { playHomeAnimations, cleanupHomeAnimations } from '../utils/homeAnimations.js';
 
 /**
  * Initialise navigation: attach click listeners to all [data-section] elements
@@ -35,10 +38,14 @@ export function showSection(sectionId) {
   const target = document.getElementById(`section-${sectionId}`);
   if (target) {
     target.style.display = 'block';
-    // Re-trigger fade animation
-    target.style.animation = 'none';
-    target.offsetHeight; // Force reflow
-    target.style.animation = '';
+    animatePageTransition(target);
+
+    if (sectionId === 'home') {
+      playHomeAnimations();
+    } else {
+      cleanupHomeAnimations();
+      animateCardStagger(target);
+    }
   }
 
   // Update active nav link

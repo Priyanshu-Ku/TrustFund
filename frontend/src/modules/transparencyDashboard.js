@@ -28,10 +28,12 @@ import {
 import { drawFundChart } from '../services/chartService.js';
 import { shortenAddress } from './donorDashboard.js';
 import { showToast } from './toastHelper.js';
+import { onThemeChange } from './themeManager.js';
 
 // --- State Variables ---
 let isRefreshing = false;
 let hasInitialized = false;
+let lastChartData = null;
 
 // Cached event log maps to associate genuine transaction hashes
 let cachedDonationTxMap = new Map(); // index or key -> txHash
@@ -156,13 +158,27 @@ export async function loadTransparencyData(isManual = false) {
     // 4. Update Fund Utilization Chart & Badge
     // Formula: (totalExpenses / totalDonations) * 100, handled safely for 0 donations
     const utilPct = donNum > 0 ? (expNum / donNum) * 100 : 0;
+    const pctText = utilPct % 1 === 0 ? `${utilPct.toFixed(0)}%` : `${utilPct.toFixed(1)}%`;
     const utilBadge = document.getElementById('trans-utilization-badge');
     if (utilBadge) {
-      const pctText = utilPct % 1 === 0 ? `${utilPct.toFixed(0)}%` : `${utilPct.toFixed(1)}%`;
       utilBadge.textContent = `${pctText} Utilized`;
     }
 
+    // Update Capital Deployment Summary fields
+    const utilDonEl = document.getElementById('trans-util-donations');
+    if (utilDonEl) utilDonEl.textContent = `${donNum.toFixed(4)} ETH`;
+
+    const utilExpEl = document.getElementById('trans-util-expenses');
+    if (utilExpEl) utilExpEl.textContent = `${expNum.toFixed(4)} ETH`;
+
+    const utilRemEl = document.getElementById('trans-util-remaining');
+    if (utilRemEl) utilRemEl.textContent = `${balNum.toFixed(4)} ETH`;
+
+    const utilRateEl = document.getElementById('trans-util-rate');
+    if (utilRateEl) utilRateEl.textContent = pctText;
+
     // Draw dynamic chart using actual blockchain values: totalExpenses and contractBalance
+    lastChartData = { donNum, expNum, balNum };
     drawFundChart('fundChart', donNum, expNum, balNum);
 
     // 5. Fetch and Render Incoming Donations Table
@@ -216,6 +232,7 @@ export async function loadTransparencyData(isManual = false) {
 
             return `
               <tr>
+                <td><strong class="text-navy">#${d.originalIndex}</strong></td>
                 <td><small class="text-muted-custom">${dateStr}</small></td>
                 <td>
                   <a href="${donorUrl}" target="_blank" rel="noopener noreferrer" class="tx-hash font-monospace text-navy text-decoration-none" title="Donor Address: ${d.donor}">
@@ -344,6 +361,13 @@ export function initTransparencyDashboard() {
       loadTransparencyData(true);
     });
   }
+
+  // Redraw chart when global theme toggles
+  onThemeChange(() => {
+    if (lastChartData) {
+      drawFundChart('fundChart', lastChartData.donNum, lastChartData.expNum, lastChartData.balNum);
+    }
+  });
 
   hasInitialized = true;
 }

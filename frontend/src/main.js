@@ -23,6 +23,7 @@ import { initTransparencyDashboard, updateTransparencyDashboard } from './module
 import { initChatbot } from './modules/chatbot.js';
 import { initReportGenerator } from './modules/reportGenerator.js';
 import { initBudgetPlanner, updateBudgetPlannerMetrics } from './modules/budgetPlanner.js';
+import { initTheme } from './modules/themeManager.js';
 
 // Make Bootstrap available globally (needed by toast helper and navigation)
 window.bootstrap = bootstrap;
@@ -43,7 +44,10 @@ function refreshAllDashboards() {
  * Initialise the entire application
  */
 function init() {
-  console.log('🛡️ TrustFund – Phase 1 Frontend Initialised');
+  console.log('🛡️ TrustFund – Frontend Initialised');
+
+  // Initialise Global Light/Dark Theme
+  initTheme();
 
   // Set up SPA-style navigation
   initNavigation((sectionId) => {

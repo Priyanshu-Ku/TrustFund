@@ -8,6 +8,7 @@
 
 import { getSummary } from '../services/blockchain.js';
 import { showToast } from './toastHelper.js';
+import { animatePanelEntrance } from '../services/animationService.js';
 import { formatPrecisionEth } from './reportGenerator.js';
 
 const BACKEND_BUDGET_URL = 'http://127.0.0.1:5000/api/ai/plan-budget';
@@ -97,13 +98,19 @@ async function handleBudgetPlanSubmit(e) {
   const prioritiesInput = document.getElementById('bpPriorities');
   const submitBtn = document.getElementById('btnGenerateBudgetPlan');
 
-  const campaignName = campaignNameInput?.value?.trim() || 'Education for All';
-  const totalBudgetEth = totalBudgetInput?.value?.trim();
+  const campaignName = campaignNameInput?.value?.trim() || '';
+  const totalBudgetEth = totalBudgetInput?.value?.trim() || '';
   const objective = objectiveInput?.value?.trim() || '';
-  const beneficiaries = beneficiariesInput?.value?.trim() || '500';
+  const beneficiaries = beneficiariesInput?.value?.trim() || '';
   const priorities = prioritiesInput?.value?.trim() || '';
 
   // Validation
+  if (!campaignName) {
+    showToast('Please enter a campaign name.', 'error');
+    campaignNameInput?.focus();
+    return;
+  }
+
   if (!totalBudgetEth) {
     showToast('Total campaign budget is required.', 'error');
     totalBudgetInput?.focus();
@@ -120,6 +127,12 @@ async function handleBudgetPlanSubmit(e) {
   if (!objective) {
     showToast('Campaign objective is required.', 'error');
     objectiveInput?.focus();
+    return;
+  }
+
+  if (!beneficiaries) {
+    showToast('Please specify expected beneficiaries.', 'error');
+    beneficiariesInput?.focus();
     return;
   }
 
@@ -339,6 +352,7 @@ function renderBudgetPlan(plan) {
 
   // Show result panel
   planPanel.classList.remove('d-none');
+  animatePanelEntrance(planPanel);
 }
 
 /**
@@ -383,7 +397,21 @@ export function initBudgetPlanner() {
       const emptyState = document.getElementById('bpEmptyState');
       if (planPanel) planPanel.classList.add('d-none');
       if (emptyState) emptyState.classList.remove('d-none');
-      showToast('Budget plan cleared.', 'info');
+
+      // Reset form inputs to completely empty values
+      if (form) form.reset();
+      const campaignNameInput = document.getElementById('bpCampaignName');
+      const totalBudgetInput = document.getElementById('bpTotalBudget');
+      const objectiveInput = document.getElementById('bpObjective');
+      const beneficiariesInput = document.getElementById('bpBeneficiaries');
+      const prioritiesInput = document.getElementById('bpPriorities');
+      if (campaignNameInput) campaignNameInput.value = '';
+      if (totalBudgetInput) totalBudgetInput.value = '';
+      if (objectiveInput) objectiveInput.value = '';
+      if (beneficiariesInput) beneficiariesInput.value = '';
+      if (prioritiesInput) prioritiesInput.value = '';
+
+      showToast('Budget plan cleared and form inputs reset.', 'info');
     });
   }
 
