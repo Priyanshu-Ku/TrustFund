@@ -154,7 +154,7 @@ class SecurityAndNonTransactionalVerification(unittest.TestCase):
 
     def test_08_reject_non_numeric_budget(self):
         """Verify standard non-numeric string budget is rejected with HTTP 400."""
-        for val in ["abc", "10eth", "--5", "five", "$100"]:
+        for val in ["abc", "10eth", "--5", "five", "$100", "NaN", "nan", "Infinity", "-Infinity"]:
             res = self.client.post("/api/ai/plan-budget", json={"total_budget_eth": val})
             self.assertEqual(res.status_code, 400, f"Expected 400 for non-numeric {val}")
             self.assertIn("valid positive number", res.get_json()["message"].lower())

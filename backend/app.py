@@ -592,6 +592,11 @@ def plan_budget():
 
     try:
         budget_dec = Decimal(str(raw_budget).strip())
+        if not budget_dec.is_finite():
+            return jsonify({
+                "status": "error",
+                "message": "Total campaign budget must be a valid positive number."
+            }), 400
     except (InvalidOperation, ValueError, TypeError):
         return jsonify({
             "status": "error",

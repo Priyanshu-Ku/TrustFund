@@ -25,6 +25,18 @@ class TestBudgetPlanner(unittest.TestCase):
         res2 = self.app.post("/api/ai/plan-budget", json={"total_budget_eth": "-5.5"})
         self.assertEqual(res2.status_code, 400)
 
+    def test_nan_infinity_and_non_finite_budgets(self):
+        """Verify NaN, Infinity, -Infinity, zero, and negative values return HTTP 400."""
+        invalid_budgets = ["NaN", "nan", "Infinity", "infinity", "-Infinity", "-infinity", "0", 0, "-1", "-5.5"]
+        for val in invalid_budgets:
+            res = self.app.post("/api/ai/plan-budget", json={"total_budget_eth": val})
+            self.assertEqual(
+                res.status_code, 400,
+                f"Expected HTTP 400 for invalid budget '{val}', got {res.status_code}"
+            )
+            data = res.get_json()
+            self.assertEqual(data["status"], "error")
+
     def test_invalid_decimal_precision(self):
         # 19 decimal places
         res = self.app.post("/api/ai/plan-budget", json={"total_budget_eth": "1.0000000000000000001"})
