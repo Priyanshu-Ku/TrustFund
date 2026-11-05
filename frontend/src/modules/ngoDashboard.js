@@ -39,6 +39,8 @@ let cachedSummary = null;          // Last fetched summary
 let expenseToApprove = null;       // Currently selected expense for approval modal
 let expenseIdToReject = null;      // Currently selected expense ID for rejection modal
 let hasAttachedListeners = false;  // Prevents duplicate event listeners
+let isCategorizingExpense = false; // Tracks in-progress AI categorization request
+let lastAiRecommendation = null;   // Holds { category, rawCategory, subcategory, reason }
 
 /**
  * Escape HTML to prevent injection from description fields
@@ -474,6 +476,187 @@ async function handleExpenseSubmit(e) {
 }
 
 /**
+ * Match an AI recommended category to one of the options in the expenseCategory select
+ */
+function findMatchingCategory(aiCategory) {
+  if (!aiCategory || typeof aiCategory !== 'string') return null;
+  const select = document.getElementById('expenseCategory');
+  if (!select) return null;
+
+  const options = Array.from(select.options)
+    .map((o) => o.value)
+    .filter(Boolean);
+
+  const cleaned = aiCategory.trim().toLowerCase();
+
+  // 1. Exact case-insensitive match
+  const exact = options.find((o) => o.toLowerCase() === cleaned);
+  if (exact) return exact;
+
+  // 2. Starts-with or includes match (e.g. "Education" matches "Education Supplies", or "Food" matches "Food & Nutrition")
+  const prefix = options.find(
+    (o) =>
+      o.toLowerCase().startsWith(cleaned) ||
+      cleaned.startsWith(o.toLowerCase()) ||
+      o.toLowerCase().includes(cleaned)
+  );
+  if (prefix) return prefix;
+
+  return null;
+}
+
+/**
+ * Request AI expense category recommendation from Gemini via Flask backend
+ */
+async function handleAiSuggestCategory() {
+  if (isCategorizingExpense) return;
+
+  const descEl = document.getElementById('expenseDescription');
+  const suggestBtn = document.getElementById('btnAiSuggestCategory');
+  const panelEl = document.getElementById('aiCategorySuggestionPanel');
+  const nameEl = document.getElementById('aiSuggestedCategoryName');
+  const subcatEl = document.getElementById('aiSuggestedSubcategory');
+  const reasonEl = document.getElementById('aiSuggestedReason');
+
+  const description = descEl ? descEl.value.trim() : '';
+
+  // 1. Validation: Description cannot be empty
+  if (!description) {
+    showToast('Please enter an expense description first before requesting AI suggestions.', 'error');
+    if (descEl) descEl.focus();
+    return;
+  }
+
+  // 2. Set loading state & prevent duplicate requests
+  isCategorizingExpense = true;
+  if (suggestBtn) {
+    suggestBtn.disabled = true;
+    suggestBtn.innerHTML = `
+      <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+      <span>Analyzing with AI...</span>
+    `;
+  }
+
+  try {
+    showToast('Consulting Gemini AI model for expense categorization...', 'info', 3000);
+
+    // Call Flask backend endpoint
+    const response = await fetch('http://127.0.0.1:5000/api/ai/categorize-expense', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ description })
+    });
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok || !result || result.status !== 'success') {
+      const errMsg = result?.message || `AI service responded with HTTP status ${response.status}.`;
+      throw new Error(errMsg);
+    }
+
+    const data = result.data;
+    if (!data || !data.category || !data.subcategory) {
+      throw new Error('AI returned an incomplete response structure.');
+    }
+
+    // Verify category is supported by the existing expense form
+    const matchedCategory = findMatchingCategory(data.category);
+    if (!matchedCategory) {
+      throw new Error(`AI suggested category "${data.category}", which is not supported by the expense form.`);
+    }
+
+    // Store recommendation in memory
+    lastAiRecommendation = {
+      category: matchedCategory,
+      rawCategory: data.category,
+      subcategory: data.subcategory,
+      reason: data.reason || 'Categorized based on expense description context.'
+    };
+
+    // Render recommendation panel
+    if (nameEl) nameEl.textContent = matchedCategory;
+    if (subcatEl) subcatEl.textContent = data.subcategory;
+    if (reasonEl) reasonEl.textContent = lastAiRecommendation.reason;
+    if (panelEl) panelEl.classList.remove('d-none');
+
+    showToast(
+      `AI Recommendation: "${matchedCategory}" (${data.subcategory})`,
+      'success'
+    );
+  } catch (err) {
+    console.error('AI categorization error:', err);
+    const errMsg = err?.message || '';
+
+    if (
+      err.name === 'TypeError' ||
+      errMsg.includes('fetch') ||
+      errMsg.includes('Failed to fetch') ||
+      errMsg.includes('NetworkError')
+    ) {
+      showToast(
+        'Unable to reach AI backend at http://127.0.0.1:5000. Please verify the Flask server is running.',
+        'error',
+        7000
+      );
+    } else {
+      showToast(`AI Categorization Failed: ${errMsg}`, 'error', 6000);
+    }
+  } finally {
+    isCategorizingExpense = false;
+    if (suggestBtn) {
+      suggestBtn.disabled = false;
+      suggestBtn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1 text-emerald">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+        </svg>
+        <span>Suggest Category with AI</span>
+      `;
+    }
+  }
+}
+
+/**
+ * Populate the category dropdown with the AI recommended category
+ */
+function handleApplyAiCategory() {
+  if (!lastAiRecommendation || !lastAiRecommendation.category) return;
+
+  const selectEl = document.getElementById('expenseCategory');
+  if (selectEl) {
+    selectEl.value = lastAiRecommendation.category;
+    // Dispatch change event to update any listeners
+    selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+
+    // Flash visual feedback on select box
+    selectEl.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+    selectEl.style.borderColor = 'var(--tf-emerald)';
+    selectEl.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.25)';
+    setTimeout(() => {
+      selectEl.style.borderColor = '';
+      selectEl.style.boxShadow = '';
+    }, 1200);
+
+    showToast(
+      `Selected "${lastAiRecommendation.category}" (Subcategory: ${lastAiRecommendation.subcategory}). You may edit this anytime before submitting.`,
+      'info',
+      5000
+    );
+  }
+}
+
+/**
+ * Dismiss the AI category suggestion panel
+ */
+function handleCloseAiSuggestion() {
+  const panelEl = document.getElementById('aiCategorySuggestionPanel');
+  if (panelEl) {
+    panelEl.classList.add('d-none');
+  }
+}
+
+/**
  * Open confirmation modal before approving an expense
  */
 function openApproveModal(expenseData) {
@@ -716,10 +899,26 @@ export function initNgoDashboard(onDataChange) {
     });
   }
 
-  // 6. Setup MetaMask event listeners
+  // 6. AI Category Suggestion button & panel handlers
+  const aiSuggestBtn = document.getElementById('btnAiSuggestCategory');
+  if (aiSuggestBtn) {
+    aiSuggestBtn.addEventListener('click', handleAiSuggestCategory);
+  }
+
+  const applyAiBtn = document.getElementById('btnApplyAiCategory');
+  if (applyAiBtn) {
+    applyAiBtn.addEventListener('click', handleApplyAiCategory);
+  }
+
+  const closeAiBtn = document.getElementById('btnCloseAiSuggestion');
+  if (closeAiBtn) {
+    closeAiBtn.addEventListener('click', handleCloseAiSuggestion);
+  }
+
+  // 7. Setup MetaMask event listeners
   setupMetaMaskListeners();
 
-  // 7. Initial load
+  // 8. Initial load
   loadNgoData();
 }
 

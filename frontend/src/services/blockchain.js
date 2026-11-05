@@ -27,6 +27,34 @@ if (!CONTRACT_ABI) {
     throw new Error("DonationTracker ABI not found.");
 }
 
+/**
+ * Strips unnecessary trailing zeros from an ETH decimal string.
+ * e.g. "0.0008000" -> "0.0008", "0.0" -> "0", "1.500" -> "1.5", "1.0" -> "1"
+ */
+export function cleanEthString(str) {
+    if (str === null || str === undefined) return "0";
+    let s = String(str).trim();
+    if (s.includes(".")) {
+        // Strip trailing zeros after non-zero decimals: e.g. 0.0008000 -> 0.0008
+        s = s.replace(/(\.\d*?[1-9])0+$/, "$1");
+        // Strip trailing .0 or .000: e.g. 0.0 -> 0, 1.0 -> 1
+        s = s.replace(/\.0+$/, "");
+        if (s === "" || s === "-") s = "0";
+    }
+    return s;
+}
+
+/**
+ * Converts Wei (BigInt) to ETH string using ethers.js formatEther()
+ * and cleans trailing zeros. Keeps precision exact in BigInt.
+ */
+export function formatEthWei(wei) {
+    if (wei === null || wei === undefined) return "0";
+    const weiBigInt = typeof wei === "bigint" ? wei : BigInt(wei.toString());
+    const ethStr = formatEther(weiBigInt);
+    return cleanEthString(ethStr);
+}
+
 // Check MetaMask availability
 function getEthereum() {
     if (!window.ethereum) {
@@ -114,12 +142,27 @@ export async function getSummary() {
 
     const result = await contract.getSummary();
 
+    // Raw on-chain values in BigInt Wei
+    const rawDonations = result[0];
+    const rawExpenses = result[1];
+    const rawPending = result[2];
+    const rawContractBal = result[3];
+    const rawAvailableBal = result[4];
+
     return {
-        totalDonations: formatEther(result[0]),
-        totalExpenses: formatEther(result[1]),
-        pendingExpenses: formatEther(result[2]),
-        contractBalance: formatEther(result[3]),
-        availableBalance: formatEther(result[4])
+        totalDonations: cleanEthString(formatEther(rawDonations)),
+        totalExpenses: cleanEthString(formatEther(rawExpenses)),
+        pendingExpenses: cleanEthString(formatEther(rawPending)),
+        contractBalance: cleanEthString(formatEther(rawContractBal)),
+        availableBalance: cleanEthString(formatEther(rawAvailableBal)),
+        // Preserve raw BigInt Wei values for exact calculations without float conversion
+        raw: {
+            totalDonations: rawDonations,
+            totalExpenses: rawExpenses,
+            pendingExpenses: rawPending,
+            contractBalance: rawContractBal,
+            availableBalance: rawAvailableBal
+        }
     };
 }
 
@@ -162,7 +205,8 @@ export async function getDonation(index) {
 
     return {
         donor: donation.donor,
-        amount: formatEther(donation.amount),
+        amount: cleanEthString(formatEther(donation.amount)),
+        amountWei: donation.amount,
         timestamp: Number(donation.timestamp)
     };
 }
@@ -227,7 +271,8 @@ export async function getExpense(index) {
 
     return {
         recipient: expense.recipient,
-        amount: formatEther(expense.amount),
+        amount: cleanEthString(formatEther(expense.amount)),
+        amountWei: expense.amount,
         category: expense.category,
         description: expense.description,
         submittedAt: Number(expense.submittedAt),

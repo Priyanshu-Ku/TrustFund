@@ -20,6 +20,8 @@ import { updateHomePage } from './modules/home.js';
 import { initDonorDashboard, updateDonorDashboard } from './modules/donorDashboard.js';
 import { initNgoDashboard, updateNgoDashboard } from './modules/ngoDashboard.js';
 import { initTransparencyDashboard, updateTransparencyDashboard } from './modules/transparencyDashboard.js';
+import { initChatbot } from './modules/chatbot.js';
+import { initReportGenerator } from './modules/reportGenerator.js';
 
 // Make Bootstrap available globally (needed by toast helper and navigation)
 window.bootstrap = bootstrap;
@@ -51,6 +53,8 @@ function init() {
   initDonorDashboard(refreshAllDashboards);
   initNgoDashboard(refreshAllDashboards);
   initTransparencyDashboard();
+  initChatbot();
+  initReportGenerator();
 
   // Initial render of all dashboards with seed data
   refreshAllDashboards();

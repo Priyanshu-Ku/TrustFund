@@ -612,6 +612,16 @@
           <p class="text-muted-custom mb-0">Report fund utilization and manage on-chain expenses on Ethereum Sepolia</p>
         </div>
         <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-emerald btn-sm px-3 rounded-pill d-flex align-items-center" id="ngoGenerateReportBtn" title="Generate AI Financial Report">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-1">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Generate AI Financial Report</span>
+          </button>
           <span class="badge badge-emerald-soft px-3 py-2" id="ngo-admin-badge">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               class="me-1">
@@ -791,14 +801,17 @@
                   <label for="expenseCategory" class="form-label fw-semibold">Expense Category</label>
                   <select class="form-select" id="expenseCategory" required>
                     <option value="" selected disabled>Select category...</option>
+                    <option value="Education">Education</option>
                     <option value="Education Supplies">Education Supplies</option>
                     <option value="Teacher Salaries">Teacher Salaries</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Food">Food</option>
+                    <option value="Food &amp; Nutrition">Food &amp; Nutrition</option>
                     <option value="Infrastructure">Infrastructure</option>
                     <option value="Transportation">Transportation</option>
-                    <option value="Food &amp; Nutrition">Food &amp; Nutrition</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Administrative">Administrative</option>
                     <option value="Technology">Technology</option>
+                    <option value="Administrative">Administrative</option>
+                    <option value="Others">Others</option>
                   </select>
                   <div class="invalid-feedback">Please select a category.</div>
                 </div>
@@ -823,11 +836,47 @@
                     approval.</div>
                 </div>
 
-                <div class="mb-4">
-                  <label for="expenseDescription" class="form-label fw-semibold">Description &amp; Purpose</label>
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label for="expenseDescription" class="form-label fw-semibold mb-0">Description &amp; Purpose</label>
+                    <button type="button" class="btn btn-outline-custom btn-sm py-1 px-2 d-flex align-items-center" id="btnAiSuggestCategory" style="font-size: 0.8rem;" title="Analyze description using Gemini AI to recommend a category">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1 text-emerald">
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                      </svg>
+                      <span>Suggest Category with AI</span>
+                    </button>
+                  </div>
                   <textarea class="form-control" id="expenseDescription" rows="3"
                     placeholder="Provide vendor or item details..." maxlength="200" required></textarea>
                   <div class="invalid-feedback">Please provide an expense description (max 200 chars).</div>
+                </div>
+
+                <!-- AI Category Recommendation Panel -->
+                <div class="card p-3 rounded-4 mb-4 border d-none" id="aiCategorySuggestionPanel" style="background: linear-gradient(135deg, rgba(5, 150, 105, 0.05) 0%, rgba(15, 23, 42, 0.02) 100%); border-color: rgba(5, 150, 105, 0.3) !important;">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge badge-emerald-soft">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-1"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                        AI Recommendation
+                      </span>
+                      <small class="text-muted-custom">Gemini 3.6 Flash</small>
+                    </div>
+                    <button type="button" class="btn-close shadow-none" style="font-size: 0.65rem;" id="btnCloseAiSuggestion" aria-label="Dismiss"></button>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <div>
+                      <span class="text-muted-custom small me-1">Category:</span>
+                      <strong class="text-navy fs-6" id="aiSuggestedCategoryName">Education</strong>
+                      <span class="badge badge-blue-soft ms-1" id="aiSuggestedSubcategory">Learning Materials</span>
+                    </div>
+                    <button type="button" class="btn btn-emerald btn-sm px-3 rounded-pill d-flex align-items-center" id="btnApplyAiCategory">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-1"><path d="M20 6L9 17l-5-5"/></svg>
+                      <span>Use This Category</span>
+                    </button>
+                  </div>
+                  <div class="small text-muted-custom">
+                    <span class="fw-semibold text-navy">Reason:</span> <span id="aiSuggestedReason">Identified classroom learning supplies.</span>
+                  </div>
                 </div>
 
                 <button type="submit"
@@ -928,6 +977,17 @@
             </svg>
             Ethereum Sepolia Ledger
           </span>
+          <button class="btn btn-emerald btn-sm px-3 rounded-pill d-flex align-items-center" id="transGenerateReportBtn"
+            title="Generate AI Financial Audit Report">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              class="me-1">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>AI Financial Report</span>
+          </button>
           <button class="btn btn-outline-custom btn-sm d-flex align-items-center" id="trans-refresh-btn"
             title="Refresh blockchain data from Sepolia">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -1376,6 +1436,211 @@
           <button type="button" class="btn btn-danger rounded-pill px-4" id="confirmRejectExpenseBtn">
             Reject Expense
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FINANCIAL REPORT MODAL ==================== -->
+  <div class="modal fade" id="financialReportModal" tabindex="-1" aria-labelledby="financialReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-2xl rounded-4">
+        
+        <!-- Modal Top Bar (hidden during print) -->
+        <div class="modal-header border-bottom py-3 px-4 d-flex justify-content-between align-items-center bg-white no-print">
+          <div class="d-flex align-items-center gap-2">
+            <div class="stat-icon bg-emerald-soft text-emerald rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+            </div>
+            <div>
+              <h5 class="modal-title fw-bold text-navy mb-0" id="financialReportModalLabel">
+                TrustFund – AI-Generated Campaign Financial Report
+              </h5>
+              <div class="d-flex align-items-center gap-2 small">
+                <span class="badge bg-emerald-soft text-emerald py-0 px-2 fw-semibold">Generated Using Gemini 3.6 Flash</span>
+                <span class="text-muted">Smart Contract Records Verified</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-emerald btn-sm px-3 rounded-pill d-flex align-items-center" id="downloadReportPdfBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="me-1">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              <span>Download as PDF</span>
+            </button>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body p-4 bg-light" id="reportModalBody">
+          
+          <!-- Loading State -->
+          <div id="reportLoadingState" class="text-center py-5">
+            <div class="spinner-grow text-emerald mb-3" style="width: 3rem; height: 3rem;" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <h5 class="fw-bold text-navy mb-2">Generating Comprehensive Audit Report</h5>
+            <p class="text-muted small mb-0 max-w-md mx-auto">
+              Reading live on-chain balances, querying Sepolia event records, and synthesizing an executive financial audit via Gemini 3.6 Flash...
+            </p>
+          </div>
+
+          <!-- Error State -->
+          <div id="reportErrorState" class="alert alert-danger border-0 rounded-4 p-4 d-none no-print">
+            <div class="d-flex align-items-start gap-3">
+              <div class="stat-icon bg-danger-subtle text-danger rounded-circle p-2 flex-shrink-0">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              </div>
+              <div>
+                <h6 class="fw-bold text-danger mb-1">Financial Report Generation Failed</h6>
+                <p class="small text-muted mb-2" id="reportErrorMessage">
+                  Unable to retrieve on-chain data or connect to the Gemini reporting service.
+                </p>
+                <button class="btn btn-outline-danger btn-sm rounded-pill px-3" id="retryReportBtn">
+                  Retry Generation
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- The Printable Report Sheet -->
+          <div id="reportContentSheet" class="report-sheet bg-white p-4 p-md-5 rounded-4 shadow-sm d-none">
+            <!-- Dynamically populated by reportGenerator.js -->
+          </div>
+
+        </div>
+
+        <!-- Modal Footer (hidden during print) -->
+        <div class="modal-footer border-top py-2 px-4 bg-white d-flex justify-content-between no-print">
+          <small class="text-muted" style="font-size: 0.75rem;">
+            🛡️ Cryptographically verified via Sepolia smart contract <code>0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4</code>
+          </small>
+          <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FLOATING AI CHATBOT WIDGET ==================== -->
+  <div class="chatbot-wrapper" id="chatbotWrapper">
+    <!-- Chatbot Toggle Floating Button -->
+    <button class="chatbot-toggle-btn shadow-lg" id="chatbotToggleBtn" aria-label="Open AI Assistant" title="Chat with TrustFund AI">
+      <span class="chatbot-toggle-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          <path d="M9.5 9h.01M14.5 9h.01M9 13c1 1 3 1 4 0"></path>
+        </svg>
+      </span>
+      <span class="chatbot-toggle-close d-none">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </span>
+      <span class="chatbot-toggle-badge position-absolute top-0 start-100 translate-middle p-1 bg-emerald border border-light rounded-circle">
+        <span class="visually-hidden">AI Ready</span>
+      </span>
+    </button>
+
+    <!-- Chatbot Card / Panel -->
+    <div class="chatbot-panel card border-0 shadow-xl d-none" id="chatbotPanel">
+      <!-- Header -->
+      <div class="chatbot-header d-flex align-items-center justify-content-between p-3 border-bottom">
+        <div class="d-flex align-items-center gap-2">
+          <div class="chatbot-avatar bg-emerald-soft text-emerald rounded-circle d-flex align-items-center justify-content-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5">
+              <path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
+              <rect x="4" y="8" width="16" height="12" rx="2"></rect>
+              <path d="M9 14v1M15 14v1M9 18h6"></path>
+            </svg>
+          </div>
+          <div>
+            <h6 class="mb-0 fw-bold text-navy" style="font-size: 0.95rem;">TrustFund AI Assistant</h6>
+            <div class="d-flex align-items-center gap-1">
+              <span class="badge bg-emerald-soft text-emerald border-0 py-0 px-2 fw-semibold" style="font-size: 0.7rem;">
+                Gemini 3.6 Flash
+              </span>
+              <span class="text-muted" style="font-size: 0.7rem;">● On-Chain Intel</span>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+          <button class="btn btn-sm btn-icon text-muted p-1" id="chatbotClearBtn" title="Clear Chat History">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+          <button class="btn btn-sm btn-icon text-muted p-1" id="chatbotCloseBtn" title="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Body -->
+      <div class="chatbot-body p-3" id="chatbotMessages">
+        <!-- Initial Assistant Message -->
+        <div class="chat-message chat-message-assistant mb-3 d-flex flex-column align-items-start">
+          <div class="chat-bubble chat-bubble-assistant">
+            <p class="mb-2">
+              👋 <strong>Welcome to TrustFund AI Assistant!</strong>
+            </p>
+            <p class="mb-0 small text-muted-custom">
+              Powered by <strong>Gemini 3.6 Flash</strong> and verified with Ethereum Sepolia smart contract data. Ask me anything about our transparent donations, fund utilization, or expense requests!
+            </p>
+          </div>
+        </div>
+
+        <!-- Suggestion Pills -->
+        <div class="chatbot-suggestions mb-2" id="chatbotSuggestions">
+          <span class="small text-muted d-block mb-1 fw-semibold">Suggested Questions:</span>
+          <div class="d-flex flex-wrap gap-1">
+            <button class="btn btn-suggestion-pill btn-sm" data-question="How much money has been donated?">
+              How much money has been donated?
+            </button>
+            <button class="btn btn-suggestion-pill btn-sm" data-question="How much money has been spent?">
+              How much money has been spent?
+            </button>
+            <button class="btn btn-suggestion-pill btn-sm" data-question="Which expenses were rejected?">
+              Which expenses were rejected?
+            </button>
+            <button class="btn btn-suggestion-pill btn-sm" data-question="What is the remaining balance?">
+              What is the remaining balance?
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Form -->
+      <div class="chatbot-footer p-2 border-top bg-white">
+        <form id="chatbotForm" class="d-flex align-items-center gap-2 m-0">
+          <input type="text" id="chatbotInput" class="form-control form-control-sm chatbot-input" placeholder="Ask about donations, expenses, balances..." autocomplete="off" maxlength="500">
+          <button type="submit" class="btn btn-emerald btn-sm px-3 chatbot-send-btn" id="chatbotSendBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+        <div class="chatbot-footnote text-center mt-1">
+          <span class="text-muted" style="font-size: 0.68rem;">Verified by Ethereum Sepolia Smart Contract</span>
         </div>
       </div>
     </div>
