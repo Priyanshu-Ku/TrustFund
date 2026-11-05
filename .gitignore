@@ -1,7 +1,6 @@
 # Environment secrets
 .env
 **/.env
-backend/.env.example
 
 # Python virtual environments
 .venv/
