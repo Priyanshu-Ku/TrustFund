@@ -1,13 +1,15 @@
 # TrustFund
 ### AI-Powered Transparent Donation Tracking Using Blockchain
 
-TrustFund is a blockchain-based donation management platform that combines Ethereum smart contracts and generative AI to improve donation transparency, simplify NGO expense management and assist administrators and donors with financial information.
+TrustFund is a decentralized donation management platform that unites Ethereum smart contracts and generative artificial intelligence to ensure end-to-end donation transparency, streamline NGO expense governance, and provide donors with real-time, plain-language financial intelligence.
 
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?logo=solidity)](https://soliditylang.org/)
 [![Ethereum Sepolia](https://img.shields.io/badge/Network-Ethereum%20Sepolia-627EEA?logo=ethereum)](https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4)
 [![Python](https://img.shields.io/badge/Backend-Python%20Flask-3776AB?logo=python&logoColor=white)](https://flask.palletsprojects.com/)
 [![Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini%203.6%20Flash-4285F4?logo=google)](https://ai.google.dev/)
 [![Vite](https://img.shields.io/badge/Frontend-Vite%20%2B%20ES6-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.8-7952B3?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
+[![Anime.js](https://img.shields.io/badge/Animations-Anime.js%20v4-FF4B4B)](https://animejs.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -17,24 +19,34 @@ TrustFund is a blockchain-based donation management platform that combines Ether
 - [Project Status & Overview](#project-status--overview)
 - [Problem Statement](#problem-statement)
 - [Key Features](#key-features)
-  - [A. Blockchain Features](#a-blockchain-features)
-  - [B. AI Features](#b-ai-features)
+  - [A. Blockchain & Smart Contract Features](#a-blockchain--smart-contract-features)
+  - [B. Generative AI Features](#b-generative-ai-features)
+  - [C. Frontend & Interactive UI Features](#c-frontend--interactive-ui-features)
+  - [D. Dynamic Home Page Impact Statistics](#d-dynamic-home-page-impact-statistics)
 - [Application Screenshots](#application-screenshots)
 - [System Architecture](#system-architecture)
+  - [High-Level Architecture Diagram](#high-level-architecture-diagram)
+  - [Operation Boundaries & Gas Requirements](#operation-boundaries--gas-requirements)
 - [Technology Stack](#technology-stack)
-- [Smart Contract Details](#smart-contract-details)
-- [Project Structure](#project-structure)
+- [Smart Contract Specification](#smart-contract-specification)
+  - [Deployed Configuration](#deployed-configuration)
+  - [Function Reference](#function-reference)
+  - [Security Mechanisms & Accounting Invariants](#security-mechanisms--accounting-invariants)
+- [Project Directory Structure](#project-directory-structure)
 - [Installation and Setup](#installation-and-setup)
   - [Prerequisites](#prerequisites)
   - [Step 1: Clone the Repository](#step-1-clone-the-repository)
   - [Step 2: Backend Setup (Python Flask)](#step-2-backend-setup-python-flask)
-  - [Step 3: Frontend Setup (Vite)](#step-3-frontend-setup-vite)
+  - [Step 3: Frontend Setup (Vite + Vanilla JS)](#step-3-frontend-setup-vite--vanilla-js)
   - [Step 4: MetaMask Wallet Setup](#step-4-metamask-wallet-setup)
-- [Environment Variables and Security](#environment-variables-and-security)
-- [AI API Documentation](#ai-api-documentation)
+- [Environment Variables & Secret Management](#environment-variables--secret-management)
+- [AI REST API Documentation](#ai-rest-api-documentation)
 - [Testing & Quality Assurance](#testing--quality-assurance)
-- [Demonstration Workflow](#demonstration-workflow)
-- [Current Demonstration Data](#current-demonstration-data)
+  - [1. Backend Automated Unit Tests](#1-backend-automated-unit-tests)
+  - [2. Security & Non-Transactional Verification Suite](#2-security--non-transactional-verification-suite)
+  - [3. Frontend Production Build](#3-frontend-production-build)
+- [Evaluator Demonstration Workflow](#evaluator-demonstration-workflow)
+- [Current Demonstration Data (Sepolia Testnet)](#current-demonstration-data-sepolia-testnet)
 - [Security, Limitations and Future Scope](#security-limitations-and-future-scope)
 - [Contributions and Academic Information](#contributions-and-academic-information)
 - [License](#license)
@@ -43,107 +55,157 @@ TrustFund is a blockchain-based donation management platform that combines Ether
 
 ## Project Status & Overview
 
-- **Project Type**: Academic Course Completion Project
-- **Primary Domain**: Blockchain Technology & Applied Generative AI
-- **Blockchain Network**: Ethereum Sepolia Testnet (Chain ID: `11155111`)
-- **Smart Contract Address**: [`0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4`](https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4)
-- **AI Engine**: Google Gemini 3.6 Flash (`gemini-3.6-flash`) via the official Google Gen AI SDK
-- **Frontend Application**: Vanilla JavaScript (ES Modules), HTML5, CSS3, Bootstrap 5, Vite build system
-- **Backend Service**: Python Flask REST API with CORS isolation
+- **Project Type**: Final Year Academic Course-Completion Project (7th Semester)
+- **Subject Domain**: Blockchain Systems & Applied Generative AI
+- **Blockchain Network**: Ethereum Sepolia Testnet (Chain ID: `11155111` / Hex: `0xaa36a7`)
+- **Deployed Contract Address**: [`0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4`](https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4)
+- **AI Model**: Google Gemini 3.6 Flash (`gemini-3.6-flash`) with automated resilient failover models
+- **Frontend Architecture**: Single Page Application (SPA) built using Vanilla JavaScript (ES Modules), HTML5, CSS3, Bootstrap 5, and Vite
+- **Backend Architecture**: Python Flask REST API with strict CORS isolation and deterministic financial arithmetic
 
 ---
 
 ## Problem Statement
 
-Conventional charitable donation and fundraising platforms frequently suffer from structural limitations:
+Conventional non-profit fundraising and philanthropic donation systems suffer from persistent structural vulnerabilities:
 
-1. **Limited Visibility into Fund Utilization**: Donors contribute capital to centralized accounts with minimal auditable insight into when, how, or to whom funds are disbursed.
-2. **Difficulty Verifying Fund Custody**: Donors cannot independently inspect treasury balances or mathematically confirm that funds remain reserved for pledged causes.
-3. **Limited Transparency in NGO Expenditure**: Expense submissions, vendor allocations, and administrative approvals occur behind closed doors in private databases.
-4. **Manual Expense Classification and Reporting**: Reviewing and standardizing expense categories, budget items, and financial disclosures requires laborious manual accounting.
-5. **Difficulty Interpreting Financial Records**: Donors often find raw transaction logs and complex accounting spreadsheets intimidating and difficult to analyze.
+1. **Opaque Fund Utilization**: Donors transfer funds into centralized bank accounts with little to no visibility into how or when capital is deployed.
+2. **Custodial Mismanagement Risk**: Once funds are received, donors cannot mathematically verify treasury balances or confirm that capital remains allocated for pledged initiatives.
+3. **Internal Accounting Silos**: NGO expense tracking, supplier payments, and administrative authorizations take place in private databases vulnerable to tampering or selective disclosure.
+4. **Labor-Intensive Classification & Audit Preparation**: Categorizing expenses, drafting compliance reports, and formatting financial disclosures requires extensive manual effort.
+5. **Information Asymmetry**: Donors rarely have the technical capability to parse complex accounting spreadsheets, raw blockchain event logs, or hex-encoded transaction receipts.
 
 ### How TrustFund Solves These Problems
 
-- **Immutable On-Chain Vault**: Contributions are transferred directly to a Solidity smart contract deployed on the Ethereum Sepolia network. Donated funds are cryptographically locked until formal expense authorization.
-- **On-Chain Expense Lifecycle**: The authorized NGO administrator submits individual expense requests directly to the smart contract. Each expense is tracked on-chain with status flags (`Pending`, `Approved`, `Rejected`), recipient address, and timestamp.
-- **Conditional Disbursements**: Only when an expense is approved on-chain does the smart contract transfer ETH directly to the recipient wallet using the Checks-Effects-Interactions pattern. Rejected claims immediately release reserved funds back into the available pool.
-- **Generative AI Assistance**: Google Gemini 3.6 Flash categorizes submitted expenses, provides plain-language explanations of on-chain activity via an interactive chatbot, synthesizes executive audit reports with PDF export, and formulates mathematically verified campaign budget allocations.
+- **Cryptographic Vault Custody**: Donations are deposited directly into a Solidity smart contract deployed on the Ethereum Sepolia network. Donated ETH is locked on-chain and cannot be withdrawn except through individual, approved expense disbursements.
+- **On-Chain Expense Lifecycle**: The authorized NGO administrator records all expense requests directly on the smart contract ledger. Every claim is recorded with its recipient address, Wei amount, category, description, and status (`Pending`, `Approved`, `Rejected`).
+- **Conditional Disbursements via Smart Contract**: ETH is transferred to vendor/recipient wallets **only** upon on-chain approval by the administrator, adhering strictly to the Checks-Effects-Interactions pattern. Rejected claims immediately release reserved funds back into the available pool.
+- **AI-Powered Accountability**: Google Gemini 3.6 Flash assists administrators with expense categorization, answers donor questions using smart contract state as ground truth, generates auditable financial reports with PDF export, and formulates mathematically verified campaign budgets.
 
 > [!IMPORTANT]
-> **Boundary of Trust**: The smart contract guarantees cryptographic custody, immutable record keeping, and rule-based ETH transfers. Blockchain technology does **not** independently verify real-world purchases, the quality of goods delivered, or the authenticity of off-chain physical receipts. TrustFund enforces transparent accountability of recorded transactions rather than automating external physical verification.
+> **Boundary of Trust**: The smart contract enforces cryptographic custody, immutable accounting, and rule-based disbursements. Blockchain technology does **not** independently verify real-world purchases, the physical delivery of goods, or the authenticity of off-chain vendor receipts. TrustFund enforces transparent accountability over recorded transactions rather than automating external real-world auditing.
 
 ---
 
 ## Key Features
 
-### A. Blockchain Features
+### A. Blockchain & Smart Contract Features
 
 1. **ETH Donations**:
-   - Donors connect their MetaMask wallet to Ethereum Sepolia.
-   - Donated ETH is transferred directly into the deployed smart contract vault via `donate()`.
-   - On-chain storage records the donor address, exact Wei amount, and block timestamp with a public `DonationReceived` event.
+   - Donors connect their MetaMask wallet via an EIP-1193 provider.
+   - ETH contributions are transferred directly into the smart contract vault via `donate()`.
+   - On-chain storage records the donor address, exact Wei value, and timestamp, emitting a public `DonationReceived` event.
 
-2. **Expense Management**:
-   - The verified NGO administrator (`admin`) submits itemized expense requests via `submitExpense()`.
-   - The smart contract validates that requested funds do not exceed available contract balance and reserves the funds as `totalPendingExpenses`.
+2. **On-Chain Expense Submission**:
+   - Authorized NGO administrators submit itemized expense claims via `submitExpense()`.
+   - The contract verifies that the requested amount does not exceed `availableBalance` (`address(this).balance - totalPendingExpenses`).
+   - Funds are reserved in `totalPendingExpenses`, and an `ExpenseSubmitted` event is broadcast.
 
-3. **Expense Approval & Fund Transfer**:
-   - The administrator reviews pending claims and invokes `approveExpense()`.
-   - Upon approval, the smart contract updates its state, decrements pending claims, increments settled expenditures, and executes an external transfer of ETH directly to the designated recipient wallet.
+3. **Expense Approval & Direct ETH Transfer**:
+   - Administrators review pending requests and invoke `approveExpense(expenseId)`.
+   - The contract updates internal accounting, marks the status as `Approved`, decrements `totalPendingExpenses`, increments `totalExpenses`, and transfers the approved ETH directly to the recipient wallet via `.call{value: amount}("")`.
 
-4. **Expense Rejection**:
-   - The administrator can decline an invalid or unsupported expense claim via `rejectExpense()`.
-   - The contract updates the claim status to `Rejected` and releases the reserved pending amount back to `availableBalance`.
+4. **Expense Rejection & Reserve Release**:
+   - If an expense claim is invalid, the administrator calls `rejectExpense(expenseId)`.
+   - The claim is marked as `Rejected`, and the reserved ETH is immediately released back to `availableBalance`.
 
-5. **Public Transparency & Etherscan Audit**:
-   - Anyone can inspect incoming donations, outgoing expenses, contract balance, and fund utilization without signing transactions.
-   - All transactions can be verified independently on the public Sepolia Etherscan explorer.
+5. **Public Transparency & Etherscan Verification**:
+   - Anyone can audit incoming donations, approved vendor disbursements, rejected requests, contract balance, and historical events.
+   - All transactions can be verified independently on the public Sepolia Etherscan explorer without requiring wallet connection or gas fees.
 
-### B. AI Features
+---
+
+### B. Generative AI Features
 
 1. **AI Expense Categorization**:
-   - When submitting expenses, administrators can request AI categorization from Gemini 3.6 Flash.
-   - The AI evaluates the description and recommends one of the six governance categories (`Education`, `Healthcare`, `Food`, `Infrastructure`, `Transportation`, `Others`), alongside a suggested subcategory and rationale.
-   - **Advisory Role**: The administrator reviews and accepts the recommendation before submitting to the blockchain. The AI never submits or executes transactions.
+   - Administrators can request AI recommendations for expense classification.
+   - Gemini evaluates the item description and selects one of six supported categories (`Education`, `Healthcare`, `Food`, `Infrastructure`, `Transportation`, `Others`), alongside a suggested subcategory and rationale.
+   - **Advisory Role**: The administrator reviews and confirms the recommendation before submitting to the blockchain. The AI never submits or executes transactions.
 
 2. **AI Donor Chatbot**:
-   - An interactive floating chatbot grounded strictly in authoritative smart contract data.
-   - Donors can query live donation totals, expense statuses, remaining balances, and vendor payouts in natural language.
-   - System prompts forbid floating-point recalculations or hallucinations; financial figures are cited verbatim from verified BigInt/Wei on-chain state.
+   - An interactive floating chatbot grounded strictly in authoritative smart contract state.
+   - Donors can query live donation totals, vendor payouts, expense statuses, and remaining balances in natural language.
+   - System prompts forbid floating-point mental arithmetic or hallucinations; numbers are cited verbatim from verified BigInt/Wei smart contract data.
 
-3. **AI Financial Report Generator**:
-   - Generates comprehensive financial summaries and executive overviews combining live smart contract metrics, donation ledgers, and expense tables.
-   - Includes a deterministic fallback synthesizer to ensure reports generate even during transient external API outages.
-   - Supports standalone, clean A4 PDF printing and browser export.
+3. **AI Financial Report Generator & PDF Export**:
+   - Generates comprehensive financial summaries and executive overviews combining on-chain metrics, donation ledgers, and expense tables.
+   - Includes a deterministic fallback engine that synthesizes reports even during external API downtime or rate-limiting.
+   - Supports clean, isolated A4 PDF browser printing with theme-neutral styling.
 
 4. **AI Campaign Budget Planner**:
-   - Empowers NGO administrators to formulate budget distributions based on strategic campaign goals, priorities, and expected beneficiaries.
-   - Produces category percentages, exact integer Wei allocations, strategic assumptions, and governance risk warnings.
-   - Authoritative Wei arithmetic and 100% budget sum verification are performed deterministically by the Python backend. The AI does not create blockchain transactions.
+   - Assists NGO administrators in formulating campaign budgets based on strategic goals, priorities, and expected beneficiaries.
+   - Generates category percentages, exact integer Wei allocations, strategic assumptions, and risk warnings.
+   - Deterministic Python backend arithmetic validates 100% budget sums and handles single-Wei remainders. The AI does not create blockchain transactions.
+
+---
+
+### C. Frontend & Interactive UI Features
+
+1. **Multi-Dashboard Single Page Application (SPA)**:
+   - **Home Page**: Campaign banner, impact metrics, protocol overview, and project summary.
+   - **Donor Dashboard**: Wallet connection, one-click ETH donations, and personal on-chain contribution history.
+   - **NGO Admin Dashboard**: Itemized expense submission with AI categorization, pending approvals, and rejection controls.
+   - **Transparency Dashboard**: Public audit ledger, chronological transaction table, and interactive Canvas fund utilization donut chart.
+
+2. **Global Light & Emerald Dark Mode**:
+   - One-click toggle in the main navigation bar.
+   - Light Theme: Clean white cards with emerald green accents and dark navy typography.
+   - Emerald Dark Theme: Deep black surfaces (`#07110E`), dark emerald cards (`#11231C`), high-contrast text (`#F0FDF4`), and emerald highlights (`#00D68F`).
+   - Theme state persists across sessions via `localStorage`.
+
+3. **Anime.js v4 Animations**:
+   - Hero banner fade-in and gentle upward lift (`650ms`, `outCubic`).
+   - Staggered entrance for Bento campaign cards (`500ms`, `stagger(90ms)`).
+   - Scroll-based reveals for lower sections using `IntersectionObserver`.
+   - Pre-run cleanup prevents visual flicker or animation duplication during rapid SPA navigation.
+   - Full accessibility compliance via `@media (prefers-reduced-motion: reduce)`.
+
+4. **HTML5 Canvas 2D Charting**:
+   - Lightweight custom donut chart rendered via the native Canvas 2D API (`chartService.js`), eliminating bulky third-party charting libraries.
+   - Automatically adapts colors, inner shadows, and legend layouts to the active theme.
+
+---
+
+### D. Dynamic Home Page Impact Statistics
+
+All metrics on the Home page reflect live on-chain smart contract data retrieved directly from Ethereum Sepolia:
+
+- **Live Impact Pool**: Synchronized with `getSummary().totalDonations`, formatted with exact Wei precision (`0.001 ETH`).
+- **Dynamic Campaign Goal Progress**: Calculated dynamically as:
+  $$\text{Progress} = \left(\frac{\text{Total Donations}}{\text{Target Goal (10 ETH)}}\right) \times 100$$
+  *(e.g., $0.001 / 10 \times 100 = 0.01\%$, updating badges and progress bars).*
+- **Dynamic Fund Utilization**: Calculated dynamically from settled on-chain expenditures:
+  $$\text{Utilization} = \left(\frac{\text{Total Expenses Paid}}{\text{Total Donations}}\right) \times 100$$
+  *(e.g., $0.0002 / 0.001 \times 100 = 20\%$, activating 1 of 5 progress segments with safe zero-donation handling).*
+- **On-Chain Ledger Count**: Displays the combined total of verified on-chain interactions (`getDonationCount() + getExpenseCount()`).
+- **Dynamic AI Assistance Status**: Formats record counts with singular/plural grammar (`on-chain record` vs `on-chain records`) and live AI operational status.
 
 ---
 
 ## Application Screenshots
 
-> Verified UI screenshots can be stored in the [`docs/assets/screenshots/`](docs/assets/screenshots/) directory.
+Verified UI screenshots can be placed in [`docs/assets/screenshots/`](docs/assets/screenshots/). The table below documents the key views and expected visual elements:
 
-| View / Feature | Preview / Placeholder |
-|---|---|
-| **Home Page** | ![Home Page](docs/assets/screenshots/home_dashboard.png)<br>_Overview banner, live impact pool, campaign progress, and on-chain ledger card_ |
-| **Donor Dashboard** | ![Donor Dashboard](docs/assets/screenshots/donor_dashboard.png)<br>_MetaMask connection, donation form, and verified personal donation history_ |
-| **NGO Admin Dashboard** | ![NGO Admin](docs/assets/screenshots/ngo_admin_dashboard.png)<br>_Expense submission form, pending approvals, and rejection controls_ |
-| **Transparency Dashboard** | ![Transparency Dashboard](docs/assets/screenshots/transparency_dashboard.png)<br>_Real-time audit ledger, Canvas fund utilization chart, and on-chain records_ |
-| **AI Expense Categorization** | ![AI Categorization](docs/assets/screenshots/ai_expense_categorization.png)<br>_Gemini 3.6 Flash category and subcategory recommendation preview_ |
-| **AI Donor Chatbot** | ![AI Chatbot](docs/assets/screenshots/ai_donor_chatbot.png)<br>_Floating conversational assistant answering queries from smart contract state_ |
-| **AI Financial Report & PDF** | ![AI Financial Report](docs/assets/screenshots/ai_financial_report.png)<br>_Executive audit report sheet with print-ready A4 PDF export_ |
-| **AI Campaign Budget Planner** | ![AI Budget Planner](docs/assets/screenshots/ai_budget_planner.png)<br>_Campaign parameter inputs, allocation percentages, and single-Wei remainder handling_ |
+| View / Feature | Image Location | Verified Key Elements |
+|---|---|---|
+| **Branding Hero** | [`Frontend/src/assets/hero.png`](Frontend/src/assets/hero.png) | TrustFund emerald shield branding and protocol identity |
+| **Home Page** | `docs/assets/screenshots/home_dashboard.png`<br>*(Placeholder)* | Anime.js hero banner, live impact pool, 20% utilization badge, and on-chain ledger card |
+| **Donor Dashboard** | `docs/assets/screenshots/donor_dashboard.png`<br>*(Placeholder)* | MetaMask connect button, donation input form, preset ETH pills, and personal contribution table |
+| **NGO Admin Dashboard** | `docs/assets/screenshots/ngo_admin_dashboard.png`<br>*(Placeholder)* | Expense submission form, recipient address input, pending claims table, and approval modal |
+| **Transparency Dashboard** | `docs/assets/screenshots/transparency_dashboard.png`<br>*(Placeholder)* | Real-time ledger, HTML5 Canvas donut chart, and clickable Etherscan transaction hashes |
+| **AI Expense Categorization** | `docs/assets/screenshots/ai_expense_categorization.png`<br>*(Placeholder)* | Gemini 3.6 Flash category recommendation modal with subcategory and rationale |
+| **AI Donor Chatbot** | `docs/assets/screenshots/ai_donor_chatbot.png`<br>*(Placeholder)* | Floating widget answering financial queries grounded in Sepolia balances |
+| **AI Financial Report & PDF** | `docs/assets/screenshots/ai_financial_report.png`<br>*(Placeholder)* | Executive audit report modal with print preview and standalone A4 PDF export button |
+| **AI Campaign Budget Planner** | `docs/assets/screenshots/ai_budget_planner.png`<br>*(Placeholder)* | Campaign parameter inputs, recommended allocation distribution, and exact Wei breakdown |
+
+> [!TIP]
+> **Adding Screenshots**: Capture your browser window at 1920×1080 resolution, save PNG files matching the filenames in the table above into `docs/assets/screenshots/`, and commit them to update the visual documentation.
 
 ---
 
 ## System Architecture
 
-TrustFund follows a decoupled, three-tier architecture separating immutable on-chain state, off-chain advisory AI processing, and a client-side presentation layer.
+### High-Level Architecture Diagram
 
 ```mermaid
 flowchart TD
@@ -164,11 +226,11 @@ flowchart TD
         Flask["Flask REST API Server<br/>(http://127.0.0.1:5000)"]
         EnvConfig["Server Configuration<br/>(.env / python-dotenv)"]
         GeminiClient["Google Gen AI SDK<br/>(gemini-3.6-flash)"]
-        GeminiCloud["Google Gemini AI Cloud<br/>(Advisory & Structured JSON)"]
+        GeminiCloud["Google Gemini AI Cloud<br/>(Structured JSON Output)"]
     end
 
     User -->|Interacts with UI| Browser
-    Browser -->|Write Operations: donate, submit, approve, reject| MetaMask
+    Browser -->|Write Transactions: donate, submit, approve, reject| MetaMask
     MetaMask -->|Sign & Broadcast Transaction| EthersJS
     EthersJS -->|On-Chain Write Tx| Contract
     Contract --> Ledger
@@ -176,7 +238,7 @@ flowchart TD
     Browser -->|Read-Only Queries: getSummary, counts| EthersJS
     EthersJS -->|eth_call Read Queries| Contract
 
-    Browser -->|POST Request: Categorize, Chat, Report, Budget| Flask
+    Browser -->|POST: Categorize, Chat, Report, Budget| Flask
     Flask --> EnvConfig
     Flask -->|Structured Prompt with Blockchain Context| GeminiClient
     GeminiClient -->|HTTPS REST / gRPC| GeminiCloud
@@ -187,143 +249,162 @@ flowchart TD
     Contract -.->|Public Verification| Etherscan
 ```
 
-### Operation Boundaries
+---
 
-| Interaction Type | Channel | Gas Required? | Writes State? | Private Key Needed? |
+### Operation Boundaries & Gas Requirements
+
+| Operation | Path | Gas Required? | State Modified? | Private Key Needed? |
 |---|---|---|---|---|
-| **Donate ETH** | Frontend &rarr; MetaMask &rarr; Smart Contract | Yes (Sepolia test ETH) | Yes | Yes (User wallet) |
-| **Submit / Approve / Reject Expense** | Frontend &rarr; MetaMask &rarr; Smart Contract | Yes (Sepolia test ETH) | Yes | Yes (Admin wallet) |
-| **Query Summary / History / Events** | Frontend &rarr; Ethers.js &rarr; RPC Provider | No | No (Read-only) | No |
-| **AI Expense Categorization** | Frontend &rarr; Flask API &rarr; Gemini API | No | No | No |
-| **AI Donor Chatbot** | Frontend &rarr; Flask API &rarr; Gemini API | No | No | No |
-| **AI Financial Report Generation** | Frontend &rarr; Flask API &rarr; Gemini API | No | No | No |
-| **AI Campaign Budget Planning** | Frontend &rarr; Flask API &rarr; Gemini API | No | No | No |
+| **Donate ETH** | Browser &rarr; MetaMask &rarr; Smart Contract | **Yes** (Sepolia ETH) | **Yes** (Contract balance & donations) | **Yes** (User signs) |
+| **Submit Expense** | Admin Browser &rarr; MetaMask &rarr; Smart Contract | **Yes** (Sepolia ETH) | **Yes** (Pending expenses reserved) | **Yes** (Admin signs) |
+| **Approve Expense** | Admin Browser &rarr; MetaMask &rarr; Smart Contract | **Yes** (Sepolia ETH) | **Yes** (Disburses ETH to recipient) | **Yes** (Admin signs) |
+| **Reject Expense** | Admin Browser &rarr; MetaMask &rarr; Smart Contract | **Yes** (Sepolia ETH) | **Yes** (Releases reserved funds) | **Yes** (Admin signs) |
+| **Read Summary / Counts** | Browser &rarr; Ethers.js &rarr; Sepolia RPC | **No** (`eth_call`) | **No** (Read-only query) | **No** |
+| **AI Expense Categorize** | Browser &rarr; Flask API &rarr; Gemini API | **No** | **No** (Advisory analysis) | **No** |
+| **AI Donor Chatbot** | Browser &rarr; Flask API &rarr; Gemini API | **No** | **No** (Natural language query) | **No** |
+| **AI Financial Report** | Browser &rarr; Flask API &rarr; Gemini API | **No** | **No** (Narrative synthesis) | **No** |
+| **AI Budget Planner** | Browser &rarr; Flask API &rarr; Gemini API | **No** | **No** (Deterministic arithmetic) | **No** |
 
 ---
 
 ## Technology Stack
 
-### Frontend
-- **HTML5 & CSS3**: Custom design tokens supporting Light and Emerald Dark Mode themes.
-- **JavaScript**: Modular vanilla ES6+ architecture (`import` / `export`).
-- **Bootstrap 5** (`v5.3.8`): Responsive grid, flexbox utilities, and modal structures.
-- **Vite** (`v8.3.5`): High-speed development server and optimized rollup bundler.
-- **Ethers.js** (`v6.17.0`): Blockchain contract interface, event queries, and BigInt/Wei formatting.
-- **Anime.js** (`v4.5.0`): Smooth hero entrances, staggered card transitions, and micro-interactions.
-- **HTML5 Canvas 2D API**: Native custom donut charts for real-time fund utilization breakdown.
+### Frontend Application
+- **Language**: Vanilla JavaScript (ES6+ Modules, native imports)
+- **Markup & Layout**: HTML5, Semantic Elements, CSS3 Custom Properties
+- **Styling & UI Framework**: Bootstrap `5.3.8` (CDN / npm)
+- **Build Tooling & Dev Server**: Vite `8.3.5`
+- **Web3 Integration**: Ethers.js `6.17.0`
+- **Animation Engine**: Anime.js `4.5.0` (ESM named imports: `animate`, `stagger`)
+- **Data Visualization**: HTML5 Canvas 2D API (Native custom donut chart)
 
 ### Blockchain & Smart Contract
-- **Solidity** (`v0.8.24`): Smart contract programming language.
-- **Ethereum Sepolia**: Decentralized test network (Chain ID: `11155111`).
-- **Remix IDE**: Contract authoring, compilation, and deployment environment.
-- **MetaMask**: EIP-1193 Web3 browser wallet provider.
-- **Sepolia Etherscan**: Public ledger inspection and event verification.
+- **Contract Language**: Solidity `^0.8.24`
+- **Target Network**: Ethereum Sepolia Testnet
+- **Network Chain ID**: `11155111` (`0xaa36a7`)
+- **Development & Compilation**: Remix IDE
+- **Wallet Provider**: MetaMask (EIP-1193)
+- **Public Explorer**: Sepolia Etherscan
 
-### Backend & AI
-- **Python** (`3.10+`): Primary server runtime.
-- **Flask** (`latest`): Lightweight WSGI web application framework.
-- **Flask-CORS** (`latest`): Cross-Origin Resource Sharing handling.
-- **google-genai** (`latest`): Official Google Gen AI SDK for Python.
-- **python-dotenv** (`latest`): Environment variable management.
-- **Google Gemini 3.6 Flash** (`gemini-3.6-flash`): Primary generative model for structured reasoning.
-- **Python Decimal & re**: Precision arithmetic, single-Wei remainder distribution, and float precision sanitization.
+### Backend & AI Tier
+- **Language**: Python `3.10+` (verified on Python `3.10`, `3.11`, `3.12`)
+- **Web Framework**: Flask (`latest`)
+- **CORS Support**: Flask-CORS (`latest`)
+- **AI SDK**: Google Gen AI SDK (`google-genai`)
+- **Environment Management**: python-dotenv (`latest`)
+- **Primary AI Model**: Google Gemini 3.6 Flash (`gemini-3.6-flash`)
+- **Fallback AI Models**: `gemini-3.5-flash-lite`, `gemini-flash-lite-latest`
+- **Precision Arithmetic**: Python Standard Library `decimal.Decimal` and `re`
 
 ---
 
-## Smart Contract Details
+## Smart Contract Specification
 
-The TrustFund smart contract is deployed on the Ethereum Sepolia Testnet.
+### Deployed Configuration
 
 ```
 Contract Name    : DonationTracker
 Solidity Version : ^0.8.24
-Network          : Ethereum Sepolia
+Network          : Ethereum Sepolia Testnet
 Chain ID         : 11155111
 Contract Address : 0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4
-Explorer Link    : https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4
+Deployment Block : 12061871
+Etherscan Link   : https://sepolia.etherscan.io/address/0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4
 ```
-
-### Solidity Function Reference
-
-| Function | Type / Visibility | Modifiers | Description |
-|---|---|---|---|
-| `donate()` | External Payable | None | Accepts ETH donations, appends a `Donation` record, increments `totalDonations`, and emits `DonationReceived`. |
-| `submitExpense(amount, category, description, recipient)` | External | `onlyAdmin` | Submits a new expense claim. Validates available balance, reserves funds in `totalPendingExpenses`, and emits `ExpenseSubmitted`. |
-| `approveExpense(expenseId)` | External | `onlyAdmin`, `nonReentrant` | Approves a pending expense, updates internal accounting state, and transfers the approved ETH to `recipient` using low-level `.call{value: amount}("")`. |
-| `rejectExpense(expenseId)` | External | `onlyAdmin` | Marks a pending expense as rejected, decrements `totalPendingExpenses`, and releases the reserved ETH back to available funds. |
-| `getSummary()` | External View | None | Returns a 5-tuple: `totalDonations`, `totalExpenses`, `totalPendingExpenses`, `contractBalance`, and `availableBalance`. |
-| `getAvailableBalance()` | Public View | None | Computes `address(this).balance - totalPendingExpenses`. |
-| `getDonationCount()` | External View | None | Returns the total count of incoming donation records. |
-| `getDonation(index)` | External View | None | Returns the `Donation` struct (donor address, Wei amount, timestamp) at the specified index. |
-| `getExpenseCount()` | External View | None | Returns the total count of submitted expense records. |
-| `getExpense(index)` | External View | None | Returns the `Expense` struct (recipient, amount, category, description, timestamps, status) at the specified index. |
-| `admin()` | Public View | None | Returns the immutable address of the NGO administrator. |
-
-### Security Mechanisms in the Contract
-
-1. **Role-Based Access Control (`onlyAdmin`)**: Critical administrative functions (`submitExpense`, `approveExpense`, `rejectExpense`) restrict execution strictly to the immutable `admin` address initialized at deployment.
-2. **Reentrancy Protection (`nonReentrant`)**: Protects the `approveExpense` disbursement function using a mutex lock (`uint256 private lock = 1`).
-3. **Checks-Effects-Interactions Pattern**: In `approveExpense`, state variables (`totalPendingExpenses`, `totalExpenses`, `expense.status`) are updated **before** executing the external ETH transfer (`recipient.call{value: amount}("")`).
-4. **Fund Reservation Logic**: New expenses cannot be submitted if `amount > address(this).balance - totalPendingExpenses`, guaranteeing the contract never over-commits capital.
 
 ---
 
-## Project Structure
+### Function Reference
+
+| Function Signature | Type | Access | Description |
+|---|---|---|---|
+| `donate()` | External Payable | Public | Accepts incoming ETH donations, stores donor address, Wei amount, and block timestamp, increments `totalDonations`, and emits `DonationReceived`. |
+| `submitExpense(uint256 amount, string calldata category, string calldata description, address payable recipient)` | External | `onlyAdmin` | Submits a new expense. Validates that `amount <= availableBalance`, reserves funds in `totalPendingExpenses`, and emits `ExpenseSubmitted`. |
+| `approveExpense(uint256 expenseId)` | External | `onlyAdmin`, `nonReentrant` | Approves a pending expense, finalizes state updates, decrements pending claims, increments `totalExpenses`, and transfers ETH to `recipient` using low-level `.call{value: amount}("")`. |
+| `rejectExpense(uint256 expenseId)` | External | `onlyAdmin` | Marks a pending expense as `Rejected`, decrements `totalPendingExpenses`, and releases reserved ETH back to available funds. Emits `ExpenseRejected`. |
+| `getSummary()` | External View | Public | Returns a 5-tuple of Wei amounts: `(totalDonations, totalExpenses, totalPendingExpenses, contractBalance, availableBalance)`. |
+| `getAvailableBalance()` | Public View | Public | Calculates and returns `address(this).balance - totalPendingExpenses`. |
+| `getDonationCount()` | External View | Public | Returns the total count of donation records stored in the `donations` array. |
+| `getDonation(uint256 index)` | External View | Public | Returns the `Donation` struct `(address donor, uint256 amount, uint256 timestamp)` at the specified index. |
+| `getExpenseCount()` | External View | Public | Returns the total count of expense records stored in the `expenses` array. |
+| `getExpense(uint256 index)` | External View | Public | Returns the `Expense` struct `(address payable recipient, uint256 amount, string category, string description, uint256 submittedAt, uint256 approvedAt, ExpenseStatus status)` at the specified index. |
+| `admin()` | Public View | Public | Returns the immutable address of the contract administrator set at deployment. |
+
+---
+
+### Security Mechanisms & Accounting Invariants
+
+1. **Role-Based Access Control (`onlyAdmin`)**:
+   Administrative functions (`submitExpense`, `approveExpense`, `rejectExpense`) enforce `require(msg.sender == admin, "Only NGO admin can perform this action")`. The admin address is set once during deployment and stored in an `immutable` state variable.
+2. **Reentrancy Protection (`nonReentrant`)**:
+   The `approveExpense` disbursement function uses a mutex lock (`uint256 private lock = 1`) to prevent reentrancy during external ETH transfers.
+3. **Checks-Effects-Interactions Pattern**:
+   State variables (`totalPendingExpenses`, `totalExpenses`, `expense.status`, `expense.approvedAt`) are updated **before** executing the external ETH transfer (`recipient.call{value: amount}("")`).
+4. **Reserve Over-Commitment Prevention**:
+   The contract strictly enforces that new expenses cannot exceed available liquid funds:
+   $$\text{amount} \le \text{address(this).balance} - \text{totalPendingExpenses}$$
+5. **Exact Arithmetic Invariant**:
+   $$\text{Total Donations} - \text{Total Expenses Paid} = \text{Contract Balance}$$
+   $$\text{Contract Balance} - \text{Total Pending Expenses} = \text{Available Balance}$$
+
+---
+
+## Project Directory Structure
 
 ```
 TrustFund/
-├── .gitignore                                # Git ignore rules for secrets and virtual environments
+├── .gitignore                                # Root Git ignore rules (secrets, venv, caches)
 ├── README.md                                 # Complete project documentation
 ├── contracts/
-│   └── DonationTracker.sol                   # Solidity smart contract source
+│   └── DonationTracker.sol                   # Solidity smart contract source code
 ├── backend/
-│   ├── .env.example                          # Example environment variables template
+│   ├── .env.example                          # Environment variables template
 │   ├── app.py                                # Flask REST API application & endpoints
-│   ├── requirements.txt                      # Python dependencies
+│   ├── requirements.txt                      # Python dependencies manifest
 │   ├── services/
-│   │   └── gemini_service.py                 # Gemini client initialization & resilient fallbacks
+│   │   └── gemini_service.py                 # Gemini SDK client & resilient fallbacks
 │   └── tests/
-│       ├── security_and_non_transactional_verification.py  # Security & isolation test suite
-│       ├── test_budget_endpoint.py           # Budget planner unit & arithmetic tests
+│       ├── security_and_non_transactional_verification.py  # Security & isolation suite (12 tests)
+│       ├── test_budget_endpoint.py           # Budget planner precision tests
 │       ├── test_chat_endpoint.py             # Chatbot prompt grounding tests
-│       ├── test_regression.py                # System regression & endpoint tests
-│       ├── test_report_endpoint.py           # Report generator validation tests
-│       └── verify_budget_planner.py          # Arithmetic & remainder validation script
+│       ├── test_regression.py                # System regression test suite
+│       ├── test_report_endpoint.py           # Financial report validation tests
+│       └── verify_budget_planner.py          # Arithmetic & remainder distribution script
 ├── Frontend/
 │   ├── index.html                            # Single Page Application structure & modals
-│   ├── package.json                          # Frontend dependencies & scripts
-│   ├── package-lock.json                     # Locked frontend dependency versions
+│   ├── package.json                          # Node.js dependencies & scripts
+│   ├── package-lock.json                     # Locked dependency tree
 │   └── src/
-│       ├── main.js                           # Frontend bootstrap & initialization
+│       ├── main.js                           # Application entry point & module wiring
 │       ├── contracts/
 │       │   └── DonationTracker.json          # Compiled smart contract ABI
 │       ├── css/
-│       │   └── styles.css                    # Custom CSS, dark theme tokens & responsive styles
+│       │   └── styles.css                    # Custom CSS, dark theme tokens & responsive layout
 │       ├── data/
-│       │   └── mockData.js                   # Campaign fallback defaults
+│       │   └── mockData.js                   # Campaign defaults & mock baselines
 │       ├── modules/
 │       │   ├── budgetPlanner.js              # AI Campaign Budget Planner module
-│       │   ├── chatbot.js                    # AI Donor Chatbot module
+│       │   ├── chatbot.js                    # AI Donor Chatbot floating widget
 │       │   ├── donorDashboard.js             # Donor Dashboard & donation flow
-│       │   ├── home.js                       # Home Page impact metrics & progress
-│       │   ├── navigation.js                 # SPA section routing & transitions
+│       │   ├── home.js                       # Home Page dynamic statistics & progress
+│       │   ├── navigation.js                 # SPA routing & page transitions
 │       │   ├── ngoDashboard.js               # NGO Admin dashboard & expense approvals
 │       │   ├── reportGenerator.js            # AI Financial Report generator & PDF export
-│       │   ├── themeManager.js               # Global Light/Dark mode switcher
-│       │   ├── toastHelper.js                # Toast notification system
+│       │   ├── themeManager.js               # Global Light/Dark theme manager
+│       │   ├── toastHelper.js                # Bootstrap toast notification manager
 │       │   └── transparencyDashboard.js      # Public ledger audit view
 │       ├── services/
 │       │   ├── animationService.js           # Anime.js v4 general animation helpers
-│       │   ├── blockchain.js                 # Ethers.js v6 smart contract integration
-│       │   └── chartService.js               # HTML5 Canvas donut chart rendering
+│       │   ├── blockchain.js                 # Ethers.js v6 smart contract interface
+│       │   └── chartService.js               # HTML5 Canvas 2D donut chart rendering
 │       └── utils/
-│           └── homeAnimations.js             # Anime.js v4 Home page entrance orchestration
+│           └── homeAnimations.js             # Anime.js v4 Home page animation orchestrator
 ├── docs/
 │   └── assets/
 │       └── screenshots/
-│           └── README.md                     # Screenshot asset guidelines & placeholders
+│           └── README.md                     # Screenshot guidelines & placement instructions
 └── reports/
-    └── TrustFund_Financial_Report.pdf        # Sample exported financial audit report
+    └── TrustFund_Financial_Report.pdf        # Verified exported financial audit report
 ```
 
 ---
@@ -332,13 +413,13 @@ TrustFund/
 
 ### Prerequisites
 
-Ensure the following tools are installed on your machine:
-- **Node.js**: `v18.0.0` or higher (verified with Node `v20.x` / `v22.x`)
+Ensure the following tools are installed:
+- **Node.js**: `v18.0.0` or higher (tested on `v20.x` and `v22.x`)
 - **npm**: `v9.0.0` or higher
-- **Python**: `3.10` or higher (verified with Python `3.10` / `3.11` / `3.12`)
-- **Git**: Installed and accessible from your terminal
-- **MetaMask Browser Extension**: Installed in Chrome, Brave, Firefox, or Edge
-- **Google Gemini API Key**: Obtain a free API key from [Google AI Studio](https://aistudio.google.com/)
+- **Python**: `3.10` or higher (tested on `3.10`, `3.11`, `3.12`)
+- **Git**: Installed and accessible in PowerShell
+- **MetaMask Browser Extension**: Installed in Chrome, Brave, Edge, or Firefox
+- **Google Gemini API Key**: Free API key from [Google AI Studio](https://aistudio.google.com/)
 
 ---
 
@@ -355,7 +436,7 @@ cd TrustFund
 
 ### Step 2: Backend Setup (Python Flask)
 
-1. Navigate to the `backend` directory:
+1. Navigate to the backend directory:
    ```powershell
    cd backend
    ```
@@ -369,14 +450,14 @@ cd TrustFund
    ```powershell
    .\.venv\Scripts\Activate.ps1
    ```
-   *(If script execution is restricted, run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` first).*
+   *(If script execution is blocked on Windows, run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` first).*
 
-4. Install the backend dependencies:
+4. Install the Python dependencies:
    ```powershell
    pip install -r requirements.txt
    ```
 
-5. Copy the example environment file and configure your API key:
+5. Create your local environment file:
    ```powershell
    Copy-Item .env.example .env
    ```
@@ -387,7 +468,7 @@ cd TrustFund
    GEMINI_MODEL="gemini-3.6-flash"
    ```
 
-7. Start the Flask server:
+7. Start the Flask REST API server:
    ```powershell
    python app.py
    ```
@@ -395,9 +476,9 @@ cd TrustFund
 
 ---
 
-### Step 3: Frontend Setup (Vite)
+### Step 3: Frontend Setup (Vite + Vanilla JS)
 
-1. Open a **second** Windows PowerShell terminal.
+1. Open a **second** Windows PowerShell terminal window.
 2. Navigate to the `Frontend` directory:
    ```powershell
    cd TrustFund\Frontend
@@ -408,48 +489,47 @@ cd TrustFund
    npm install
    ```
 
-4. Launch the Vite development server:
+4. Start the Vite development server:
    ```powershell
    npm run dev
    ```
-   *Vite will display the local development URL (typically `http://localhost:5173/` or `http://localhost:5174/`). Open this URL in your browser.*
+   *Vite will display the local development URL (typically `http://localhost:5173/` or `http://localhost:5174/`). Open this URL in your web browser.*
 
 ---
 
 ### Step 4: MetaMask Wallet Setup
 
-1. Open the MetaMask browser extension.
-2. In the network selector, enable test networks and select **Sepolia**.
-3. Verify the network details:
-   - **Network Name**: Sepolia Test Network
+1. Open the MetaMask extension in your browser.
+2. Click the network selector in the top-left corner, enable **Show test networks**, and select **Sepolia**.
+3. Verify the Sepolia network parameters:
+   - **Network Name**: Sepolia
+   - **New RPC URL**: `https://rpc.sepolia.org` or any public Sepolia RPC endpoint
    - **Chain ID**: `11155111`
    - **Currency Symbol**: `SepoliaETH`
-4. Obtain Sepolia test ETH from an academic or community faucet (e.g., [Google Cloud Web3 Sepolia Faucet](https://cloud.google.com/application/web3/faucet/ethereum/sepolia) or [Sepolia PoW Faucet](https://sepolia-faucet.pk910.de/)).
-5. Click **"Connect Wallet"** in the TrustFund navigation bar.
-
-> [!NOTE]
-> **Testnet Notice**: Ethereum Sepolia is a test network. Sepolia ETH holds zero monetary value and must be used exclusively for academic demonstrations and testing.
+   - **Block Explorer URL**: `https://sepolia.etherscan.io`
+4. Acquire Sepolia test ETH from a faucet (e.g., [Google Cloud Web3 Sepolia Faucet](https://cloud.google.com/application/web3/faucet/ethereum/sepolia) or [Sepolia PoW Faucet](https://sepolia-faucet.pk910.de/)).
+5. In the TrustFund application, click **"Connect Wallet"** in the top navigation bar to pair your account.
 
 ---
 
-## Environment Variables and Security
+## Environment Variables & Secret Management
 
-Backend environment configuration is stored in `backend/.env`.
+Configuration for the backend is managed via `backend/.env`.
 
-| Variable | Required | Default Value | Description |
+| Variable | Required? | Default Value | Purpose |
 |---|---|---|---|
 | `GEMINI_API_KEY` | **Yes** | `""` | Google Gemini API key obtained from Google AI Studio. |
-| `GEMINI_MODEL` | No | `gemini-3.6-flash` | Primary model identifier. Resilient fallbacks (`gemini-3.5-flash-lite`, `gemini-flash-lite-latest`) are handled in code. |
+| `GEMINI_MODEL` | No | `gemini-3.6-flash` | Target model identifier. Fallback models (`gemini-3.5-flash-lite`, `gemini-flash-lite-latest`) are handled in `gemini_service.py`. |
 
-### Security Rules Enforced in TrustFund
+### Security Boundaries Enforced in TrustFund
 
 1. **`.env` is Excluded from Git**: `backend/.env` is explicitly listed in `.gitignore` and must **never** be committed to version control.
 2. **Server-Side API Key Storage**: The `GEMINI_API_KEY` is exclusively read and utilized by the Python Flask backend. It is **never** bundled into or exposed to frontend JavaScript.
-3. **No Wallet Secrets**: Private keys, seed phrases, and mnemonic words are **never** requested, stored, or configured in backend or frontend files. All transaction signing occurs exclusively within the user's local MetaMask extension.
+3. **No Private Key Ingestion**: Private keys, seed phrases, and mnemonic words are **never** requested, stored, or processed by backend or frontend files. All transaction signing occurs exclusively within the user's local MetaMask extension.
 
 ---
 
-## AI API Documentation
+## AI REST API Documentation
 
 The backend service runs on `http://127.0.0.1:5000` and exposes 5 REST endpoints:
 
@@ -468,7 +548,7 @@ The backend service runs on `http://127.0.0.1:5000` and exposes 5 REST endpoints
 
 ### 2. AI Expense Categorization
 - **Endpoint**: `POST /api/ai/categorize-expense`
-- **Description**: Recommends a standard category and subcategory based on an expense description.
+- **Description**: Evaluates an expense description and recommends an on-chain category, subcategory, and rationale.
 - **Request Body**:
   ```json
   {
@@ -486,9 +566,7 @@ The backend service runs on `http://127.0.0.1:5000` and exposes 5 REST endpoints
     }
   }
   ```
-- **Error Responses**:
-  - `400 Bad Request`: Description missing, not a string, or exceeds 1,000 characters.
-  - `502 Bad Gateway` / `503 Service Unavailable`: AI response malformed or Gemini service temporarily unavailable.
+- **Validation**: Rejects missing descriptions or descriptions exceeding 1,000 characters with `HTTP 400`. Enforces that the returned category strictly matches one of the 6 allowed governance categories.
 
 ---
 
@@ -515,14 +593,13 @@ The backend service runs on `http://127.0.0.1:5000` and exposes 5 REST endpoints
     "answer": "According to verified Ethereum Sepolia records, a total of 0.001 ETH has been received in donations. 0.0002 ETH has been paid out for approved expenditures, leaving a contract balance of 0.0008 ETH available in reserves."
   }
   ```
-- **Error Responses**:
-  - `400 Bad Request`: Question missing or exceeds 1,000 characters; `blockchain_context` not an object.
+- **Validation & Grounding**: System prompts explicitly forbid mental arithmetic or hallucinations; numbers are cited verbatim from the provided context. Responses pass through `sanitize_eth_precision` to eliminate float precision artifacts.
 
 ---
 
 ### 4. AI Financial Report Generator
 - **Endpoint**: `POST /api/ai/generate-report`
-- **Description**: Compiles an executive audit report narrative summarizing on-chain donations and expenditures.
+- **Description**: Synthesizes an 8-section executive audit report from live smart contract metrics and event logs.
 - **Request Body**:
   ```json
   {
@@ -564,14 +641,7 @@ The backend service runs on `http://127.0.0.1:5000` and exposes 5 REST endpoints
       "contract_address": "0xd27935e718a7bf17cbcbe28c4391380fb9e95cc4",
       "network": "Ethereum Sepolia (Chain ID 11155111)",
       "generated_at": "November 05, 2026, 10:30:00 UTC",
-      "financial_summary": {
-        "total_donations": "0.001 ETH",
-        "total_expenses": "0.0002 ETH",
-        "pending_expenses": "0 ETH",
-        "contract_balance": "0.0008 ETH",
-        "available_balance": "0.0008 ETH",
-        "fund_utilization_percent": 20.0
-      },
+      "financial_summary": { ... },
       "sections": {
         "executive_summary": "...",
         "campaign_overview": "...",
@@ -587,7 +657,7 @@ The backend service runs on `http://127.0.0.1:5000` and exposes 5 REST endpoints
     }
   }
   ```
-- **Resilience Feature**: If the external Gemini API is unreachable or rate-limited, the endpoint automatically invokes `generate_deterministic_report_sections()` to produce verified on-chain narrative text without failure.
+- **Deterministic Resilience**: If the Gemini API is unreachable or rate-limited, `generate_deterministic_report_sections()` automatically produces a verified on-chain narrative text without throwing errors.
 
 ---
 
@@ -678,22 +748,24 @@ The backend service runs on `http://127.0.0.1:5000` and exposes 5 REST endpoints
     }
   }
   ```
-- **Arithmetic Guarantee**: The endpoint calculates `amount_wei` with deterministic integer arithmetic and applies single-Wei remainder distribution to guarantee `sum(amount_wei) == total_budget_wei`.
-- **Validation**: Rejects `NaN`, `Infinity`, `-Infinity`, zero, negative values, and inputs exceeding 18 decimal places with `HTTP 400`.
+- **Deterministic Math & Remainder Reconciliation**: Percentages sum to exactly 100%. Exact integer Wei allocations are computed by the backend:
+  $$\text{allocation\_wei} = \frac{\text{total\_wei} \times \text{percentage}}{100}$$
+  Any division remainders are assigned to the highest allocation category, guaranteeing $\sum \text{amount\_wei} = \text{total\_budget\_wei}$.
+- **Validation**: Rejects `NaN`, `Infinity`, `-Infinity`, zero, negative numbers, or numbers with >18 decimal places with `HTTP 400 Bad Request`.
 
 ---
 
 ## Testing & Quality Assurance
 
-### 1. Backend Test Suite
+### 1. Backend Automated Unit Tests
 
-Run the automated backend test suite from the repository root:
+Run the backend test suite from the repository root:
 
 ```powershell
 python -m unittest discover -s backend/tests -v
 ```
 
-#### Test Suite Coverage (20 Tests Passed)
+#### Test Suite Results (20/20 Tests Passed in ~0.39s)
 - **Arithmetic Precision Tests**: Verifies arbitrary odd budgets (e.g. `1.111111111111111111 ETH`), single-Wei remainder distribution, and exact 100% budget sum invariant.
 - **Input Validation Tests**: Verifies that `NaN`, `Infinity`, `-Infinity`, empty strings, zero, negative numbers, and numbers with >18 decimals return `HTTP 400 Bad Request`.
 - **Prompt Grounding & Anti-Hallucination Tests**: Verifies that chatbot system prompts explicitly forbid float arithmetic and mental calculations, compelling citation of exact blockchain context figures.
@@ -710,7 +782,7 @@ To verify that AI endpoints and advisory modules are completely isolated from bl
 python backend/tests/security_and_non_transactional_verification.py
 ```
 
-#### Verification Scope (12 Tests Passed)
+#### Verification Results (12/12 Tests Passed in ~0.09s)
 - Confirms frontend `budgetPlanner.js` contains **zero** transaction-signing tokens (`connectWallet`, `getSignerContract`, `donate`, `submitExpense`, `approveExpense`, `rejectExpense`, `sendTransaction`, `privateKey`).
 - Confirms backend `app.py` and `gemini_service.py` contain **zero** Ethereum transaction-signing dependencies or private key references.
 - Confirms that AI endpoints perform exclusively read-only or advisory calculations.
@@ -731,7 +803,7 @@ npm --prefix Frontend run build
 
 ---
 
-## Demonstration Workflow
+## Evaluator Demonstration Workflow
 
 To demonstrate TrustFund during an academic evaluation or presentation, follow this sequence:
 
@@ -776,9 +848,9 @@ To demonstrate TrustFund during an academic evaluation or presentation, follow t
 
 ---
 
-## Current Demonstration Data
+## Current Demonstration Data (Sepolia Testnet)
 
-The following figures represent historical test records on the Sepolia smart contract as of November 2026:
+The following figures represent historical demonstration test records on the Sepolia smart contract as of November 2026:
 
 | Metric | Historical Demonstration Value | Status |
 |---|---|---|
@@ -850,4 +922,3 @@ This project was developed as an academic course-completion project in Blockchai
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
